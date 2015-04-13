@@ -83,6 +83,14 @@ int main(int argc, char *argv[]){
 	SDL_RenderPresent(renderer);//present loading message
 	SDL_DestroyTexture(loading);//don't need this texture
 
+	//set initial values
+	pointa.p.x = PAX;
+	pointa.p.y = PAY;
+	pointb.p.x = PBX;
+	pointb.p.y = PBY;
+	pointc.p.x = PCX;
+	pointc.p.y = PCY;
+
 	//load textures
 	pen = GetTexture("pen.png");//get pen texture
 
@@ -116,21 +124,22 @@ int main(int argc, char *argv[]){
 		SDL_RenderClear(renderer);//clear screen
 
 
+		double scale = 1;
+		double shift = 0;
 
 
 
-
-		pointax = 0.25*ws;//set x and y position for a, b and c
-		pointay = 0.75*hs;
-		pointbx = 0.75*ws;
-		pointby = 0.75*hs;
-		pointcx = MouseX;
-		pointcy = MouseY;
+		double tax = pointa.p.x * scale + shift;//set x and y position for a, b and c
+		double tay = pointa.p.y * scale + shift;
+		double tbx = pointb.p.x * scale + shift;
+		double tby = pointb.p.y * scale + shift;
+		double tcx = pointc.p.x * scale + shift;
+		double tcy = pointc.p.y * scale + shift;
 
 		SDL_DestroyTexture(testimg);//destroy test image texture
 		testimg = GetTextTexture(font_4, "Test", 0, 0, 0);//image to display for testing
 		DrawText(testimg, 0.5*ws, 0.5*hs, NULL, 1);//draw text
-		DrawTriangle(pointax, pointay, pointbx, pointby, pointcx, pointcy);//draw triangle for test
+		DrawTriangle(tax, tay, tbx, tby, tcx, tcy);//draw triangle for test
 
 
 
@@ -659,7 +668,7 @@ void DrawLine(double ax, double ay, double bx, double by){//draw line for those 
 	for (i = 0; i < hypot(ax - bx, ay - by)*maxside; i++){//for each dot on line
 		double x = ax - ((ax - bx) / (hypot(ax - bx, ay - by)*maxside))*i;//set x
 		double y = ay - ((ay - by) / (hypot(ax - bx, ay - by)*maxside))*i;//set y
-		DrawText(pen, x, y, NULL, 1);//draw point centerd at full size
+		DrawIMG(pen, x, y, NULL, PEN_SIZE, PEN_SIZE, 1);//draw point centerd at full size
 	}
 }
 

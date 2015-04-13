@@ -25,7 +25,7 @@
 #define HEIGHT display.h/2;
 #endif
 
-
+#define PEN_SIZE 0.0078125
 
 #define WINDOW_NAME "Trigonometry"
 #define DELAY 10 //default delay
@@ -36,7 +36,13 @@
 #define FONTS "fonts/" //fonts path. Inside media resources path.
 #define FONT "OpenSans-Regular.ttf" //font path
 
-
+//defalut points
+#define PAX 0.0
+#define PAY 1.0
+#define PBX 1.0
+#define PBY 1.0
+#define PCX 0.5
+#define PCY (1.0 - (0.5*sqrt(3.0)))
 
 
 
@@ -60,8 +66,32 @@ SDL_Texture *testimg;//image to test if it works
 SDL_Texture *pen;//pen to draw with
 
 
-double pointax, pointay, pointbx, pointby, pointcx, pointcy;//a, b and c of the triangle to do calculations on
 
+typedef struct point{
+	double x, y;//x and y position
+}Point;
+
+typedef struct line{
+	double l;//length
+}Line;
+
+typedef struct angle{
+	double a;//angle
+}Angle;
+
+typedef union value{//value
+	Point p;//point
+	Line l;//line
+	Angle a;//angle
+}Value;
+
+Value pointa, pointb, pointc;//point a, b and c of the triangle to do calculations on
+Value linea, lineb, linec;//line a, b and c of triangle to calculate on
+Value anglea, angleb, anglec;//angle a, b and c of triangle to calculate on
+Value lineh;//height of triangle
+
+Value *Selected;//selected object
+Value *Edit[3];//edited value in order
 
 
 
