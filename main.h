@@ -45,6 +45,7 @@ SDL_Renderer *renderer;//sdl renderer
 SDL_Event event;//event
 
 int width, height, maxside;//width and hight and smallest of 2 side of window
+double ws, hs;//width and height scaled to maxside
 time_t lasttime;//last time mesured
 unsigned long int lastframe;//last frame recorded
 unsigned long int frame;//number of frames from start
@@ -56,6 +57,10 @@ SDL_Texture *somethingwentwrong;//image to display if something goes wrong
 
 
 SDL_Texture *testimg;//image to test if it works
+SDL_Texture *pen;//pen to draw with
+
+
+double pointax, pointay, pointbx, pointby, pointcx, pointcy;//a, b and c of the triangle to do calculations on
 
 
 
@@ -88,8 +93,9 @@ SDL_Texture* GetTexture(const char *file);//make texture from this file
 TTF_Font* GetFont(const char *file, int size);//get font from file
 SDL_Texture* GetTextTexture(TTF_Font* font, const char* text, int r, int g, int b);//make texture from font text and rgb
 void DrawBase(void);//draw basic stuff
-void DrawText(SDL_Texture *texture, double x, double y, SDL_Rect *rect, int center);//draw rect of texture at x and y position normalised. Null rect for whole texture. set center to 1 to center to x and y
+void DrawText(SDL_Texture *texture, double x, double y, SDL_Rect *rect, int center);//draw rect of texture at x and y position normalised. Null rect for whole texture. set center to 1 to center to x and y. Draws texture at full size
 void DrawIMG(SDL_Texture *texture, double x, double y, SDL_Rect *rect, double w, double h, int center);//draw rect of texture at x and y position normalised at scale from maxside. Null rect for whole texture. set center to 1 to center to x and y
-
+void DrawTriangle(double ax, double ay, double bx, double by, double cx, double cy);//draw triangle for those points with 1 as maxside
+void DrawLine(double ax, double ay, double bx, double by);//draw line for those points with 1 as maxside
 
 #endif

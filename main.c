@@ -83,6 +83,8 @@ int main(int argc, char *argv[]){
 	SDL_RenderPresent(renderer);//present loading message
 	SDL_DestroyTexture(loading);//don't need this texture
 
+	//load textures
+	pen = GetTexture("pen.png");//get pen texture
 
 
 
@@ -96,7 +98,7 @@ int main(int argc, char *argv[]){
 				Quit();//quit everything
 				break;//get out
 			case SDL_MOUSEBUTTONDOWN://when clicking down
-					Clicked(event.button.x, event.button.y);//run clicked function 
+				Clicked(event.button.x, event.button.y);//run clicked function 
 				break;//get out
 			case SDL_MOUSEMOTION://when mouse moved
 				MouseX = (double)(event.button.x) / maxside;//set x and y position of mouse from square normalised
@@ -116,10 +118,19 @@ int main(int argc, char *argv[]){
 
 
 
+
+
+		pointax = 0.25*ws;//set x and y position for a, b and c
+		pointay = 0.75*hs;
+		pointbx = 0.75*ws;
+		pointby = 0.75*hs;
+		pointcx = MouseX;
+		pointcy = MouseY;
+
 		SDL_DestroyTexture(testimg);//destroy test image texture
 		testimg = GetTextTexture(font_4, "Test", 0, 0, 0);//image to display for testing
-		DrawText(testimg, 0.5, 0.5, NULL, 1);//draw text
-
+		DrawText(testimg, 0.5*ws, 0.5*hs, NULL, 1);//draw text
+		DrawTriangle(pointax, pointay, pointbx, pointby, pointcx, pointcy);//draw triangle for test
 
 
 
@@ -282,6 +293,10 @@ void GetDisplay(void){//get display
 	else {
 		maxside = width;
 	}
+
+	ws = (double)width / (double)maxside;//get width and height 
+	hs = (double)height / (double)maxside;
+
 	return;//exit function
 }
 
@@ -536,7 +551,7 @@ void DrawBase(void){//draw basic stuff
 
 
 
-void DrawText(SDL_Texture *texture, double x, double y, SDL_Rect *rect, int center){//draw rect of texture at x and y position normalised. Null rect for whole texture. set center to 1 to center to x and y
+void DrawText(SDL_Texture *texture, double x, double y, SDL_Rect *rect, int center){//draw rect of texture at x and y position normalised. Null rect for whole texture. set center to 1 to center to x and y. Draws texture at full size
 	if (texture == NULL) {//if texture passed dosen't exist
 		texture = somethingwentwrong;//set texture to something went wrong
 	}
@@ -546,8 +561,8 @@ void DrawText(SDL_Texture *texture, double x, double y, SDL_Rect *rect, int cent
 	SDL_QueryTexture(texture, &format, &access, &w, &h);//get text box size
 	dest.w = (int) w;//set width and height
 	dest.h = (int) h;
-	dest.x = (int)(x * width);//set x and y
-	dest.y = (int)(y * height);
+	dest.x = (int)(x * maxside);//set x and y
+	dest.y = (int)(y * maxside);
 
 	if (center){
 		dest.x = dest.x - dest.w / 2;//set x and y centered to x and y
@@ -590,8 +605,8 @@ void DrawIMG(SDL_Texture *texture, double x, double y, SDL_Rect *rect, double w,
 	}	SDL_Rect dest;
 	dest.w = (int) (maxside * w);//set width and height
 	dest.h = (int) (maxside * h);
-	dest.x = (int)(x * width);//set x and y
-	dest.y = (int)(y * height);
+	dest.x = (int)(x * maxside);//set x and y
+	dest.y = (int)(y * maxside);
 
 	if (center){
 		dest.x = dest.x - dest.w / 2;//set x and y centered to x and y
@@ -600,6 +615,52 @@ void DrawIMG(SDL_Texture *texture, double x, double y, SDL_Rect *rect, double w,
 
 	SDL_RenderCopy(renderer, texture, rect, &dest);//draw texture
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void DrawTriangle(double ax, double ay, double bx, double by, double cx, double cy){//draw triangle for those points with 1 as maxside
+	DrawLine(ax, ay, bx, by);//draw line from a to b
+	DrawLine(bx, by, cx, cy);//draw line from b to c
+	DrawLine(cx, cy, ax, ay);//draw line from c to a
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void DrawLine(double ax, double ay, double bx, double by){//draw line for those points with 1 as maxside
+	int i;//counter
+	for (i = 0; i < hypot(ax - bx, ay - by)*maxside; i++){//for each dot on line
+		double x = ax - ((ax - bx) / (hypot(ax - bx, ay - by)*maxside))*i;//set x
+		double y = ay - ((ay - by) / (hypot(ax - bx, ay - by)*maxside))*i;//set y
+		DrawText(pen, x, y, NULL, 1);//draw point centerd at full size
+	}
 }
 
 
