@@ -90,6 +90,9 @@ int main(int argc, char *argv[]){
 	pointb.p.y = PBY;
 	pointc.p.x = PCX;
 	pointc.p.y = PCY;
+	Edit[0] = &pointa;
+	Edit[1] = &pointb;
+	Edit[3] = &pointc;
 
 	//load textures
 	pen = GetTexture("pen.png");//get pen texture
@@ -123,18 +126,37 @@ int main(int argc, char *argv[]){
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);//draw white
 		SDL_RenderClear(renderer);//clear screen
 
+		Value *Left = &pointc, *Right = &pointc, *Top = &pointc, *Bottom = &pointc;//right, left, top and bottom point
+		double scale = 1;//scale up or down
+		double xshift;//shift in x direction
+		double yshift;//shift in y direction
 
-		double scale = 1;
-		double shift = 0;
+		//calculate top, bottom, left and right
+		if (pointa.p.x < Left->p.x)Left = &pointa;//get left
+		if (pointb.p.x < Left->p.x)Left = &pointb;
+		if (pointa.p.x > Right->p.x)Right = &pointa;//get right
+		if (pointb.p.x > Right->p.x)Right = &pointb;
+		if (pointa.p.y < Top->p.y)Top = &pointa;//get top
+		if (pointb.p.y < Top->p.y)Top = &pointb;
+		if (pointa.p.y > Bottom->p.y)Bottom = &pointa;//get bottom
+		if (pointb.p.y > Bottom->p.y)Bottom = &pointb;
+		//calculate scale 
+		if ((hs * 0.74) / (Bottom->p.y - Top->p.y) < (ws * 0.98) / (Right->p.x - Left->p.x)){//if height scale is bigger then width
+			scale = (hs * 0.74) / (Bottom->p.y - Top->p.y);//calculate scale
+		}
+		else{//if width scale is bigger
+			scale =(ws * 0.98) / (Right->p.x - Left->p.x);//calculate scale
+		}
+		//calculate shifts
+		xshift = (ws*0.5) - ((Right->p.x * scale + Left->p.x * scale)*0.5);//get shift to get triangle to center
+		yshift = (hs*0.75) - (Bottom->p.y * scale);//get shift to get triangle 1/4 up
 
-
-
-		double tax = pointa.p.x * scale + shift;//set x and y position for a, b and c
-		double tay = pointa.p.y * scale + shift;
-		double tbx = pointb.p.x * scale + shift;
-		double tby = pointb.p.y * scale + shift;
-		double tcx = pointc.p.x * scale + shift;
-		double tcy = pointc.p.y * scale + shift;
+		double tax = pointa.p.x * scale + xshift;//set x and y position for a, b and c
+		double tay = pointa.p.y * scale + yshift;
+		double tbx = pointb.p.x * scale + xshift;
+		double tby = pointb.p.y * scale + yshift;
+		double tcx = pointc.p.x * scale + xshift;
+		double tcy = pointc.p.y * scale + yshift;
 
 		SDL_DestroyTexture(testimg);//destroy test image texture
 		testimg = GetTextTexture(font_4, "Test", 0, 0, 0);//image to display for testing

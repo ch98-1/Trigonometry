@@ -42,7 +42,7 @@
 #define PBX 1.0
 #define PBY 1.0
 #define PCX 0.5
-#define PCY (1.0 - (0.5*sqrt(3.0)))
+#define PCY (1.0 - (0.5*sqrt(3.0)))//equilateral triangle
 
 
 
