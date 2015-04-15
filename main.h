@@ -14,6 +14,7 @@
 
 
 #define FULLLSCREEN //define if fullscreen
+//#define FPS //print out fps
 
 #ifdef FULLLSCREEN 
 #define WINDOWFLAGS SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS        //fullscreen borderless window
@@ -27,6 +28,7 @@
 
 #define PEN_SIZE 0.0078125
 #define CLICK_RANGE 0.05
+#define RADIAN 0.0174532925
 
 #define WINDOW_NAME "Trigonometry"
 #define DELAY 10 //default delay
@@ -69,11 +71,12 @@ SDL_Texture *Text_C;
 SDL_Texture *Text_a;
 SDL_Texture *Text_b;
 SDL_Texture *Text_c;
+SDL_Texture *Text_h;
 SDL_Texture *pen;//pen to draw with
 
 double tax, tay, tbx, tby, tcx, tcy;//triangle that will be drawn on screen
 
-double lAx, lAy, lBx, lBy, lCx, lCy, lax, lay, lbx, lby, lcx, lcy;//center points for labels on the triangle
+double lAx, lAy, lBx, lBy, lCx, lCy, lax, lay, lbx, lby, lcx, lcy, lhx, lhy;//center points for labels on the triangle
 
 double scale;//scale up or down
 double xshift;//shift in x direction
@@ -93,7 +96,7 @@ typedef struct line{
 }Line;
 
 typedef struct angle{
-	double a;//angle
+	double a;//angle in degrees
 	int priority;//priority of this value
 	int known;//if value is certain
 }Angle;
@@ -110,6 +113,8 @@ Value anglea, angleb, anglec;//angle a, b and c of triangle to calculate on
 Value lineh;//height of triangle
 
 Value *Selected;//selected object
+
+int rad;//if in radians
 
 
 
@@ -146,5 +151,7 @@ void DrawText(SDL_Texture *texture, double x, double y, SDL_Rect *rect, int cent
 void DrawIMG(SDL_Texture *texture, double x, double y, SDL_Rect *rect, double w, double h, int center);//draw rect of texture at x and y position normalised at scale from maxside. Null rect for whole texture. set center to 1 to center to x and y
 void DrawTriangle(double ax, double ay, double bx, double by, double cx, double cy);//draw triangle for those points with 1 as maxside
 void DrawLine(double ax, double ay, double bx, double by);//draw line for those points with 1 as maxside
+void GetKnown(void);//recalculate known values
+void Calculate(void);//calculate values in the triangle
 
 #endif

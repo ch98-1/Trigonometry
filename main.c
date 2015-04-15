@@ -186,15 +186,23 @@ int main(int argc, char *argv[]){
 		if (tay > tcy){//if c is above a
 			if (tax > tbx){//if a is right of b
 				lAx = tax + 0.02;//calculate point label A and B
-				lBx = tay + 0.02;
+				lAy = tay + 0.02;
 				lBx = tbx - 0.02;
-				lBx = tby + 0.02;
+				lBy = tby + 0.02;
+				lax = (tbx + tcx) / 2 - 0.02;//calculate line label a and b
+				lay = (tby + tcy) / 2;
+				lbx = (tax + tcx) / 2 + 0.02;
+				lby = (tay + tcy) / 2;
 			}
 			else{//if a is left of b
 				lAx = tax - 0.02;//calculate point label A and B
 				lAy = tay + 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby + 0.02;
+				lax = (tbx + tcx) / 2 + 0.02;//calculate line label a and b
+				lay = (tby + tcy) / 2;
+				lbx = (tax + tcx) / 2 - 0.02;
+				lby = (tay + tcy) / 2;
 			}
 			lCx = tcx;//calculate point label C
 			lCy = tcy - 0.0225;
@@ -205,19 +213,35 @@ int main(int argc, char *argv[]){
 				lAy = tay - 0.02;
 				lBx = tbx - 0.02;
 				lBy = tby - 0.02;
+				lax = (tbx + tcx) / 2 - 0.02;//calculate line label a and b
+				lay = (tby + tcy) / 2;
+				lbx = (tax + tcx) / 2 + 0.02;
+				lby = (tay + tcy) / 2;
 			}
 			else{//if a is left of b
 				lAx = tax - 0.02;//calculate point label A and B
 				lAy = tay - 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby - 0.02;
+				lax = (tbx + tcx) / 2 + 0.02;//calculate line label a and b
+				lay = (tby + tcy) / 2;
+				lbx = (tax + tcx) / 2 - 0.02;
+				lby = (tay + tcy) / 2;
 			}
+
 			lCx = tcx;//calculate point label C
 			lCy = tcy + 0.0225;
 		}
+		lhx = tcx + 0.02;//calculate line label h
+		lhy = (tay + tcy)/2;
+
 		DrawText(Text_A, lAx, lAy, NULL, 1);//draw labels on the triangle
 		DrawText(Text_B, lBx, lBy, NULL, 1);
 		DrawText(Text_C, lCx, lCy, NULL, 1);
+		DrawText(Text_a, lax, lay, NULL, 1);
+		DrawText(Text_b, lbx, lby, NULL, 1);
+		DrawText(Text_c, lcx, lcy, NULL, 1);
+		DrawText(Text_h, lhx, lhy, NULL, 1);
 
 		DrawTriangle(tax, tay, tbx, tby, tcx, tcy);//draw triangle
 
@@ -327,6 +351,7 @@ void Quit(void){//quit everything
 	SDL_DestroyTexture(Text_a);
 	SDL_DestroyTexture(Text_b);
 	SDL_DestroyTexture(Text_c);
+	SDL_DestroyTexture(Text_h);
 
 
 
@@ -446,43 +471,19 @@ void Draged(void){
 		pointc.p.y -= (tcy - MouseY)/scale;
 
 		pointa.p.known = 1;//only trust points
-		pointb.p.known = 1;
-		pointc.p.known = 1;
-		linea.l.known = 0;
-		lineb.l.known = 0;
-		linec.l.known = 0;
-		anglea.a.known = 0;
-		angleb.a.known = 0;
-		anglec.a.known = 0;
-		lineh.l.known = 0;
+		Calculate();//recalculate triangle
 	}
 	else if (hypot(tbx - MouseX, tby - MouseY) < CLICK_RANGE){//if mouse is within the range of b
 		pointb.p.x -= (tbx - MouseX) / scale;//move x
 
 		pointa.p.known = 1;//only trust points
-		pointb.p.known = 1;
-		pointc.p.known = 1;
-		linea.l.known = 0;
-		lineb.l.known = 0;
-		linec.l.known = 0;
-		anglea.a.known = 0;
-		angleb.a.known = 0;
-		anglec.a.known = 0;
-		lineh.l.known = 0;
+		Calculate();//recalculate triangle
 	}
 	else if (hypot(tax - MouseX, tay - MouseY) < CLICK_RANGE){//if mouse is within the range of a
 		pointa.p.x -= (tax - MouseX) / scale;//move x
 		
 		pointa.p.known = 1;//only trust points
-		pointb.p.known = 1;
-		pointc.p.known = 1;
-		linea.l.known = 0;
-		lineb.l.known = 0;
-		linec.l.known = 0;
-		anglea.a.known = 0;
-		angleb.a.known = 0;
-		anglec.a.known = 0;
-		lineh.l.known = 0;
+		Calculate();//recalculate triangle
 	}
 	return;//exit function
 }
@@ -667,6 +668,7 @@ void Resize(void){//recalculate numbers related to size and load texts
 		SDL_DestroyTexture(Text_a);
 		SDL_DestroyTexture(Text_b);
 		SDL_DestroyTexture(Text_c);
+		SDL_DestroyTexture(Text_h);
 
 		Text_A = GetTextTexture(font_32, "A", 0, 0, 0);//create new textures of the labels
 		Text_B = GetTextTexture(font_32, "B", 0, 0, 0);
@@ -674,6 +676,8 @@ void Resize(void){//recalculate numbers related to size and load texts
 		Text_a = GetTextTexture(font_32, "a", 0, 0, 0);
 		Text_b = GetTextTexture(font_32, "b", 0, 0, 0);
 		Text_c = GetTextTexture(font_32, "c", 0, 0, 0);
+		Text_h = GetTextTexture(font_32, "h", 0, 0, 0);
+
 	}
 }
 
@@ -839,6 +843,78 @@ void DrawLine(double ax, double ay, double bx, double by){//draw line for those 
 		DrawIMG(pen, x, y, NULL, PEN_SIZE, PEN_SIZE, 1);//draw point centerd at full size
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void GetKnown(void){//recalculate known points
+	if (pointa.p.known || pointb.p.known || pointc.p.known){//if one of the points are known
+		pointa.p.known = 1;//only trust points
+		pointb.p.known = 1;
+		pointc.p.known = 1;
+		linea.l.known = 0;
+		lineb.l.known = 0;
+		linec.l.known = 0;
+		anglea.a.known = 0;
+		angleb.a.known = 0;
+		anglec.a.known = 0;
+		lineh.l.known = 0;
+	}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void Calculate(void){//calculate values in the triangle
+	GetKnown();
+	if (pointa.p.known && pointb.p.known && pointc.p.known){//if points are known
+		linea.l.l = hypot(pointb.p.x - pointc.p.x, pointb.p.y - pointc.p.y);//get lines
+		lineb.l.l = hypot(pointa.p.x - pointc.p.x, pointa.p.y - pointc.p.y);
+		linec.l.l = hypot(pointb.p.x - pointa.p.x, pointb.p.y - pointa.p.y);
+		lineh.l.l = fabs(pointc.p.y - pointa.p.y);//get height
+	}
+
+}
+
+
+
+
+
+
+
 
 
 
