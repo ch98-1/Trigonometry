@@ -26,6 +26,7 @@
 #endif
 
 #define PEN_SIZE 0.0078125
+#define CLICK_RANGE 0.05
 
 #define WINDOW_NAME "Trigonometry"
 #define DELAY 10 //default delay
@@ -72,21 +73,29 @@ SDL_Texture *pen;//pen to draw with
 
 double tax, tay, tbx, tby, tcx, tcy;//triangle that will be drawn on screen
 
+double lAx, lAy, lBx, lBy, lCx, lCy, lax, lay, lbx, lby, lcx, lcy;//center points for labels on the triangle
+
+double scale;//scale up or down
+double xshift;//shift in x direction
+double yshift;//shift in y direction
+
 
 
 typedef struct point{
 	double x, y;//x and y position
-	int known;//if vakue is certain
+	int known;//if value is certain
 }Point;
 
 typedef struct line{
 	double l;//length
-	int known;//if vakue is certain
+	int priority;//priority of this value
+	int known;//if value is certain
 }Line;
 
 typedef struct angle{
 	double a;//angle
-	int known;//if vakue is certain
+	int priority;//priority of this value
+	int known;//if value is certain
 }Angle;
 
 typedef union value{//value
@@ -101,7 +110,6 @@ Value anglea, angleb, anglec;//angle a, b and c of triangle to calculate on
 Value lineh;//height of triangle
 
 Value *Selected;//selected object
-Value *Edit[3];//edited value in order
 
 
 
@@ -128,6 +136,7 @@ int EventFilter(void* userdata, SDL_Event* e);//event filter
 void Quit(void);//quit everything
 void GetDisplay(void);//get display
 void Clicked(long int x, long int y);//x and y positions clicked
+void Draged(void);//draged function to call when mouse is moved while it is down
 void Resize(void);//recalculate numbers related to size and load texts
 SDL_Texture* GetTexture(const char *file);//make texture from this file
 TTF_Font* GetFont(const char *file, int size);//get font from file

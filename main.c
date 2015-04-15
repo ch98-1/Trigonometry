@@ -92,9 +92,24 @@ int main(int argc, char *argv[]){
 	pointb.p.y = PBY;
 	pointc.p.x = PCX;
 	pointc.p.y = PCY;
-	Edit[0] = &pointa;
-	Edit[1] = &pointb;
-	Edit[3] = &pointc;
+	linea.l.priority = 0;//priority from high to low
+	lineb.l.priority = 1;
+	linec.l.priority = 2;
+	anglea.a.priority = 3;
+	angleb.a.priority = 4;
+	anglec.a.priority = 5;
+	lineh.l.priority = 6;
+	pointa.p.known = 1;//only trust points at start
+	pointb.p.known = 1;
+	pointc.p.known = 1;
+	linea.l.known = 0;
+	lineb.l.known = 0;
+	linec.l.known = 0;
+	anglea.a.known = 0;
+	angleb.a.known = 0;
+	anglec.a.known = 0;
+	lineh.l.known = 0;
+
 
 	//load textures
 	pen = GetTexture("pen.png");//get pen texture
@@ -117,6 +132,9 @@ int main(int argc, char *argv[]){
 			case SDL_MOUSEMOTION://when mouse moved
 				MouseX = (double)(event.button.x) / maxside;//set x and y position of mouse from square normalised
 				MouseY = (double)(event.button.y) / maxside;
+				if (event.button.button == SDL_BUTTON_LEFT || event.button.which == SDL_TOUCH_MOUSEID){//if mouse is pressed down
+					Draged();//run draged function 
+				}
 				break;//get out
 			case SDL_WINDOWEVENT://when window was changed
 				Resize();//resize stuff
@@ -130,9 +148,7 @@ int main(int argc, char *argv[]){
 		SDL_RenderClear(renderer);//clear screen
 
 		Value *Left = &pointc, *Right = &pointc, *Top = &pointc, *Bottom = &pointc;//right, left, top and bottom point
-		double scale = 1;//scale up or down
-		double xshift;//shift in x direction
-		double yshift;//shift in y direction
+		scale = 1;//scale up or down
 
 		//calculate top, bottom, left and right
 		if (pointa.p.x < Left->p.x)Left = &pointa;//get left
@@ -167,17 +183,41 @@ int main(int argc, char *argv[]){
 		SDL_RenderDrawLine(renderer, tax * maxside, tay * maxside, tcx * maxside, tay * maxside);//base extension line
 		SDL_RenderDrawLine(renderer, tbx * maxside, tby * maxside, tcx * maxside, tby * maxside);//base extansion line
 
-		
-		if (tax > tbx){//if a is right of b
-			DrawText(Text_A, tax + 0.02, tay + 0.02, NULL, 1);//draw point label A and B
-			DrawText(Text_B, tbx - 0.02, tby + 0.02, NULL, 1);
+		if (tay > tcy){//if c is above a
+			if (tax > tbx){//if a is right of b
+				lAx = tax + 0.02;//calculate point label A and B
+				lBx = tay + 0.02;
+				lBx = tbx - 0.02;
+				lBx = tby + 0.02;
+			}
+			else{//if a is left of b
+				lAx = tax - 0.02;//calculate point label A and B
+				lAy = tay + 0.02;
+				lBx = tbx + 0.02;
+				lBy = tby + 0.02;
+			}
+			lCx = tcx;//calculate point label C
+			lCy = tcy - 0.0225;
 		}
-		else{//if a is left of b
-			DrawText(Text_A, tax - 0.02, tay + 0.02, NULL, 1);//draw point label A and B
-			DrawText(Text_B, tbx + 0.02, tby + 0.02, NULL, 1);
+		else{//if c is below a
+			if (tax > tbx){//if a is right of b
+				lAx = tax + 0.02;//calculate point label A and B
+				lAy = tay - 0.02;
+				lBx = tbx - 0.02;
+				lBy = tby - 0.02;
+			}
+			else{//if a is left of b
+				lAx = tax - 0.02;//calculate point label A and B
+				lAy = tay - 0.02;
+				lBx = tbx + 0.02;
+				lBy = tby - 0.02;
+			}
+			lCx = tcx;//calculate point label C
+			lCy = tcy + 0.0225;
 		}
-		DrawText(Text_C, tcx, tcy - 0.0225, NULL, 1);//draw point label C
-
+		DrawText(Text_A, lAx, lAy, NULL, 1);//draw labels on the triangle
+		DrawText(Text_B, lBx, lBy, NULL, 1);
+		DrawText(Text_C, lCx, lCy, NULL, 1);
 
 		DrawTriangle(tax, tay, tbx, tby, tcx, tcy);//draw triangle
 
@@ -189,6 +229,9 @@ int main(int argc, char *argv[]){
 			fps = frame - lastframe;//set fps
 			lasttime = time(NULL);//set new lasttime
 			lastframe = frame;
+#ifdef FPS
+			printf("%d fps\n", fps);
+#endif
 		}
 		frame++;//increment frame
 
@@ -374,10 +417,73 @@ void GetDisplay(void){//get display
 
 
 void Clicked(long int x, long int y){//x and y positions clicked
-
-
 	MouseX = (double)(x) / maxside;//set x and y position of mouse from square normalised
 	MouseY = (double)(y) / maxside;
+	return;//exit function
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void Draged(void){
+	if (hypot(tcx - MouseX, tcy - MouseY) < CLICK_RANGE){//if mouse is within the range of c
+		pointc.p.x -= (tcx - MouseX)/scale;//move x and y
+		pointc.p.y -= (tcy - MouseY)/scale;
+
+		pointa.p.known = 1;//only trust points
+		pointb.p.known = 1;
+		pointc.p.known = 1;
+		linea.l.known = 0;
+		lineb.l.known = 0;
+		linec.l.known = 0;
+		anglea.a.known = 0;
+		angleb.a.known = 0;
+		anglec.a.known = 0;
+		lineh.l.known = 0;
+	}
+	else if (hypot(tbx - MouseX, tby - MouseY) < CLICK_RANGE){//if mouse is within the range of b
+		pointb.p.x -= (tbx - MouseX) / scale;//move x
+
+		pointa.p.known = 1;//only trust points
+		pointb.p.known = 1;
+		pointc.p.known = 1;
+		linea.l.known = 0;
+		lineb.l.known = 0;
+		linec.l.known = 0;
+		anglea.a.known = 0;
+		angleb.a.known = 0;
+		anglec.a.known = 0;
+		lineh.l.known = 0;
+	}
+	else if (hypot(tax - MouseX, tay - MouseY) < CLICK_RANGE){//if mouse is within the range of a
+		pointa.p.x -= (tax - MouseX) / scale;//move x
+		
+		pointa.p.known = 1;//only trust points
+		pointb.p.known = 1;
+		pointc.p.known = 1;
+		linea.l.known = 0;
+		lineb.l.known = 0;
+		linec.l.known = 0;
+		anglea.a.known = 0;
+		angleb.a.known = 0;
+		anglec.a.known = 0;
+		lineh.l.known = 0;
+	}
 	return;//exit function
 }
 
