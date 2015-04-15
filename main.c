@@ -189,9 +189,9 @@ int main(int argc, char *argv[]){
 				lAy = tay + 0.02;
 				lBx = tbx - 0.02;
 				lBy = tby + 0.02;
-				lax = (tbx + tcx) / 2 - 0.03;//calculate line label a and b
+				lax = (tbx + tcx) / 2 - 0.03125;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 + 0.03;
+				lbx = (tax + tcx) / 2 + 0.03125;
 				lby = (tay + tcy) / 2;
 			}
 			else{//if a is left of b
@@ -199,9 +199,9 @@ int main(int argc, char *argv[]){
 				lAy = tay + 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby + 0.02;
-				lax = (tbx + tcx) / 2 + 0.03;//calculate line label a and b
+				lax = (tbx + tcx) / 2 + 0.03125;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 - 0.03;
+				lbx = (tax + tcx) / 2 - 0.03125;
 				lby = (tay + tcy) / 2;
 			}
 			lCx = tcx;//calculate point label C
@@ -216,9 +216,9 @@ int main(int argc, char *argv[]){
 				lAy = tay - 0.02;
 				lBx = tbx - 0.02;
 				lBy = tby - 0.02;
-				lax = (tbx + tcx) / 2 - 0.03;//calculate line label a and b
+				lax = (tbx + tcx) / 2 - 0.03125;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 + 0.03;
+				lbx = (tax + tcx) / 2 + 0.03125;
 				lby = (tay + tcy) / 2;
 			}
 			else{//if a is left of b
@@ -226,9 +226,9 @@ int main(int argc, char *argv[]){
 				lAy = tay - 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby - 0.02;
-				lax = (tbx + tcx) / 2 + 0.03;//calculate line label a and b
+				lax = (tbx + tcx) / 2 + 0.03125;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 - 0.03;
+				lbx = (tax + tcx) / 2 - 0.03125;
 				lby = (tay + tcy) / 2;
 			}
 			lCx = tcx;//calculate point label C
