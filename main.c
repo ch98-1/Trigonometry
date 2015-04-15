@@ -189,9 +189,9 @@ int main(int argc, char *argv[]){
 				lAy = tay + 0.02;
 				lBx = tbx - 0.02;
 				lBy = tby + 0.02;
-				lax = (tbx + tcx) / 2 - 0.02;//calculate line label a and b
+				lax = (tbx + tcx) / 2 - 0.03;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 + 0.02;
+				lbx = (tax + tcx) / 2 + 0.03;
 				lby = (tay + tcy) / 2;
 			}
 			else{//if a is left of b
@@ -199,13 +199,16 @@ int main(int argc, char *argv[]){
 				lAy = tay + 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby + 0.02;
-				lax = (tbx + tcx) / 2 + 0.02;//calculate line label a and b
+				lax = (tbx + tcx) / 2 + 0.03;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 - 0.02;
+				lbx = (tax + tcx) / 2 - 0.03;
 				lby = (tay + tcy) / 2;
 			}
 			lCx = tcx;//calculate point label C
 			lCy = tcy - 0.0225;
+			lcx = (tax + tbx) / 2;//calculate line label c
+			lcy = (tay + tby) / 2 + 0.02;
+
 		}
 		else{//if c is below a
 			if (tax > tbx){//if a is right of b
@@ -213,9 +216,9 @@ int main(int argc, char *argv[]){
 				lAy = tay - 0.02;
 				lBx = tbx - 0.02;
 				lBy = tby - 0.02;
-				lax = (tbx + tcx) / 2 - 0.02;//calculate line label a and b
+				lax = (tbx + tcx) / 2 - 0.03;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 + 0.02;
+				lbx = (tax + tcx) / 2 + 0.03;
 				lby = (tay + tcy) / 2;
 			}
 			else{//if a is left of b
@@ -223,14 +226,16 @@ int main(int argc, char *argv[]){
 				lAy = tay - 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby - 0.02;
-				lax = (tbx + tcx) / 2 + 0.02;//calculate line label a and b
+				lax = (tbx + tcx) / 2 + 0.03;//calculate line label a and b
 				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 - 0.02;
+				lbx = (tax + tcx) / 2 - 0.03;
 				lby = (tay + tcy) / 2;
 			}
-
 			lCx = tcx;//calculate point label C
 			lCy = tcy + 0.0225;
+			lcx = (tax + tbx) / 2;//calculate line label c
+			lcy = (tay + tby) / 2 - 0.02;
+
 		}
 		lhx = tcx + 0.02;//calculate line label h
 		lhy = (tay + tcy)/2;
