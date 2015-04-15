@@ -3,6 +3,8 @@
 
 
 int main(int argc, char *argv[]){
+	renderer = NULL;//set values to null
+	window = NULL;
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0){//start SDL and get any error if it dosen't.
 		printf("Could not load SDL: %s\n", SDL_GetError());//print out error
@@ -36,8 +38,8 @@ int main(int argc, char *argv[]){
 	atexit(Quit);
 
 
-	window = NULL;//window is NULL before calling first GetDisplay function
-	Resize();//get display and load images
+
+	Resize();//get display
 
 
 	//Create window
@@ -97,6 +99,7 @@ int main(int argc, char *argv[]){
 	//load textures
 	pen = GetTexture("pen.png");//get pen texture
 
+	Resize();//reload display
 
 
 
@@ -141,27 +144,42 @@ int main(int argc, char *argv[]){
 		if (pointa.p.y > Bottom->p.y)Bottom = &pointa;//get bottom
 		if (pointb.p.y > Bottom->p.y)Bottom = &pointb;
 		//calculate scale 
-		if ((hs * 0.74) / (Bottom->p.y - Top->p.y) < (ws * 0.98) / (Right->p.x - Left->p.x)){//if height scale is bigger then width
-			scale = (hs * 0.74) / (Bottom->p.y - Top->p.y);//calculate scale
+		if ((hs * 0.70) / (Bottom->p.y - Top->p.y) < (ws * 0.90) / (Right->p.x - Left->p.x)){//if height scale is bigger then width
+			scale = (hs * 0.70) / (Bottom->p.y - Top->p.y);//calculate scale
 		}
 		else{//if width scale is bigger
-			scale =(ws * 0.98) / (Right->p.x - Left->p.x);//calculate scale
+			scale =(ws * 0.90) / (Right->p.x - Left->p.x);//calculate scale
 		}
 		//calculate shifts
 		xshift = (ws*0.5) - ((Right->p.x * scale + Left->p.x * scale)*0.5);//get shift to get triangle to center
 		yshift = (hs*0.75) - (Bottom->p.y * scale);//get shift to get triangle 1/4 up
 
-		double tax = pointa.p.x * scale + xshift;//set x and y position for a, b and c
-		double tay = pointa.p.y * scale + yshift;
-		double tbx = pointb.p.x * scale + xshift;
-		double tby = pointb.p.y * scale + yshift;
-		double tcx = pointc.p.x * scale + xshift;
-		double tcy = pointc.p.y * scale + yshift;
+		tax = pointa.p.x * scale + xshift;//set x and y position for a, b and c
+		tay = pointa.p.y * scale + yshift;
+		tbx = pointb.p.x * scale + xshift;
+		tby = pointb.p.y * scale + yshift;
+		tcx = pointc.p.x * scale + xshift;
+		tcy = pointc.p.y * scale + yshift;
 
-		SDL_DestroyTexture(testimg);//destroy test image texture
-		testimg = GetTextTexture(font_4, "Test", 0, 0, 0);//image to display for testing
-		DrawText(testimg, 0.5*ws, 0.5*hs, NULL, 1);//draw text
-		DrawTriangle(tax, tay, tbx, tby, tcx, tcy);//draw triangle for test
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);//draw red for height
+		SDL_RenderDrawLine(renderer, tcx * maxside, tay * maxside, tcx * maxside, tcy * maxside);//height line
+		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);//draw blue for height
+		SDL_RenderDrawLine(renderer, tax * maxside, tay * maxside, tcx * maxside, tay * maxside);//base extension line
+		SDL_RenderDrawLine(renderer, tbx * maxside, tby * maxside, tcx * maxside, tby * maxside);//base extansion line
+
+		
+		if (tax > tbx){//if a is right of b
+			DrawText(Text_A, tax + 0.02, tay + 0.02, NULL, 1);//draw point label A and B
+			DrawText(Text_B, tbx - 0.02, tby + 0.02, NULL, 1);
+		}
+		else{//if a is left of b
+			DrawText(Text_A, tax - 0.02, tay + 0.02, NULL, 1);//draw point label A and B
+			DrawText(Text_B, tbx + 0.02, tby + 0.02, NULL, 1);
+		}
+		DrawText(Text_C, tcx, tcy - 0.0225, NULL, 1);//draw point label C
+
+
+		DrawTriangle(tax, tay, tbx, tby, tcx, tcy);//draw triangle
 
 
 
@@ -260,7 +278,12 @@ int EventFilter(void* userdata, SDL_Event* e){//event filter
 
 
 void Quit(void){//quit everything
-	SDL_DestroyTexture(testimg);//destroy textures
+	SDL_DestroyTexture(Text_A);//destroy textures
+	SDL_DestroyTexture(Text_B);
+	SDL_DestroyTexture(Text_C);
+	SDL_DestroyTexture(Text_a);
+	SDL_DestroyTexture(Text_b);
+	SDL_DestroyTexture(Text_c);
 
 
 
@@ -506,7 +529,7 @@ SDL_Texture* GetTextTexture(TTF_Font* font, const char* text, int r, int g, int 
 
 
 
-void Resize(void){//recalculate numbers related to size
+void Resize(void){//recalculate numbers related to size and load texts
 	GetDisplay();//get display
 
 
@@ -529,6 +552,23 @@ void Resize(void){//recalculate numbers related to size
 	font_32 = GetFont(FONT, maxside / 32);
 	font_46 = GetFont(FONT, maxside / 46);
 	font_64 = GetFont(FONT, maxside / 64);
+
+
+	if (renderer != NULL){//if there is a renderer
+		SDL_DestroyTexture(Text_A);//destroy textures
+		SDL_DestroyTexture(Text_B);
+		SDL_DestroyTexture(Text_C);
+		SDL_DestroyTexture(Text_a);
+		SDL_DestroyTexture(Text_b);
+		SDL_DestroyTexture(Text_c);
+
+		Text_A = GetTextTexture(font_32, "A", 0, 0, 0);//create new textures of the labels
+		Text_B = GetTextTexture(font_32, "B", 0, 0, 0);
+		Text_C = GetTextTexture(font_32, "C", 0, 0, 0);
+		Text_a = GetTextTexture(font_32, "a", 0, 0, 0);
+		Text_b = GetTextTexture(font_32, "b", 0, 0, 0);
+		Text_c = GetTextTexture(font_32, "c", 0, 0, 0);
+	}
 }
 
 

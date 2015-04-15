@@ -38,11 +38,11 @@
 
 //defalut points
 #define PAX 0.0
-#define PAY 1.0
+#define PAY 0//base is 0 for a and b
 #define PBX 1.0
-#define PBY 1.0
+#define PBY 0
 #define PCX 0.5
-#define PCY (1.0 - (0.5*sqrt(3.0)))//equilateral triangle
+#define PCY (-(0.5*sqrt(3.0)))//equilateral triangle
 
 
 
@@ -62,26 +62,36 @@ SDL_Texture *somethingwentwrong;//image to display if something goes wrong
 
 
 
-SDL_Texture *testimg;//image to test if it works
+SDL_Texture *Text_A;//text for labels
+SDL_Texture *Text_B;
+SDL_Texture *Text_C;
+SDL_Texture *Text_a;
+SDL_Texture *Text_b;
+SDL_Texture *Text_c;
 SDL_Texture *pen;//pen to draw with
+
+double tax, tay, tbx, tby, tcx, tcy;//triangle that will be drawn on screen
 
 
 
 typedef struct point{
 	double x, y;//x and y position
+	int known;//if vakue is certain
 }Point;
 
 typedef struct line{
 	double l;//length
+	int known;//if vakue is certain
 }Line;
 
 typedef struct angle{
 	double a;//angle
+	int known;//if vakue is certain
 }Angle;
 
 typedef union value{//value
 	Point p;//point
-	Line l;//line
+	Line l;//line length
 	Angle a;//angle
 }Value;
 
@@ -118,7 +128,7 @@ int EventFilter(void* userdata, SDL_Event* e);//event filter
 void Quit(void);//quit everything
 void GetDisplay(void);//get display
 void Clicked(long int x, long int y);//x and y positions clicked
-void Resize(void);//recalculate numbers related to size
+void Resize(void);//recalculate numbers related to size and load texts
 SDL_Texture* GetTexture(const char *file);//make texture from this file
 TTF_Font* GetFont(const char *file, int size);//get font from file
 SDL_Texture* GetTextTexture(TTF_Font* font, const char* text, int r, int g, int b);//make texture from font text and rgb
