@@ -86,7 +86,9 @@ int main(int argc, char *argv[]){
 	SDL_DestroyTexture(loading);//don't need this texture
 
 	//set initial values
-	pointa.p.x = PAX;
+	ix = 0.5 * ws;//image width and height
+	iy = 0.5 * hs;
+	pointa.p.x = PAX;//triangle default
 	pointa.p.y = PAY;
 	pointb.p.x = PBX;
 	pointb.p.y = PBY;
@@ -113,6 +115,19 @@ int main(int argc, char *argv[]){
 
 	//load textures
 	pen = GetTexture("pen.png");//get pen texture
+	Background = NULL;//no background
+	if (argc == 2){//if there is second argument
+		SDL_Surface* surface = IMG_Load(argv[1]);//load surface
+		if (surface == NULL){//if it could not be loaded
+			printf("could not load image: %s\n", IMG_GetError());//error message
+		}
+		SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);//get texture from loaded image
+		if (texture == NULL){//if it could not be converted to texture
+			printf("could not create texture: %s\n", SDL_GetError());//error message
+		}
+		SDL_FreeSurface(surface);//free surface
+		Background = texture;//set texture
+	}
 
 	Resize();//reload display
 
@@ -146,6 +161,7 @@ int main(int argc, char *argv[]){
 		}
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);//draw white
 		SDL_RenderClear(renderer);//clear screen
+		DrawBase();//draw background image
 
 		Value *Left = &pointc, *Right = &pointc, *Top = &pointc, *Bottom = &pointc;//right, left, top and bottom point
 		scale = 1;//scale up or down
@@ -189,20 +205,20 @@ int main(int argc, char *argv[]){
 				lAy = tay + 0.02;
 				lBx = tbx - 0.02;
 				lBy = tby + 0.02;
-				lax = (tbx + tcx) / 2 - 0.03125;//calculate line label a and b
-				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 + 0.03125;
-				lby = (tay + tcy) / 2;
+				lax = (tbx + tcx) / 2 - 0.03125 * (tby - tcy);//calculate line label a and b
+				lay = (tby + tcy) / 2 + 0.03125 * (tbx - tcx);
+				lbx = (tax + tcx) / 2 + 0.03125 * (tay - tcy);
+				lby = (tay + tcy) / 2 - 0.03125 * (tax - tcx);
 			}
 			else{//if a is left of b
 				lAx = tax - 0.02;//calculate point label A and B
 				lAy = tay + 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby + 0.02;
-				lax = (tbx + tcx) / 2 + 0.03125;//calculate line label a and b
-				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 - 0.03125;
-				lby = (tay + tcy) / 2;
+				lax = (tbx + tcx) / 2 + 0.03125 * (tby - tcy);//calculate line label a and b
+				lay = (tby + tcy) / 2 - 0.03125 * (tbx - tcx);
+				lbx = (tax + tcx) / 2 - 0.03125 * (tay - tcy);
+				lby = (tay + tcy) / 2 + 0.03125 * (tax - tcx);
 			}
 			lCx = tcx;//calculate point label C
 			lCy = tcy - 0.0225;
@@ -216,29 +232,29 @@ int main(int argc, char *argv[]){
 				lAy = tay - 0.02;
 				lBx = tbx - 0.02;
 				lBy = tby - 0.02;
-				lax = (tbx + tcx) / 2 - 0.03125;//calculate line label a and b
-				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 + 0.03125;
-				lby = (tay + tcy) / 2;
+				lax = (tbx + tcx) / 2 + 0.03125 * (tby - tcy);//calculate line label a and b
+				lay = (tby + tcy) / 2 - 0.03125 * (tbx - tcx);
+				lbx = (tax + tcx) / 2 - 0.03125 * (tay - tcy);
+				lby = (tay + tcy) / 2 + 0.03125 * (tax - tcx);
 			}
 			else{//if a is left of b
 				lAx = tax - 0.02;//calculate point label A and B
 				lAy = tay - 0.02;
 				lBx = tbx + 0.02;
 				lBy = tby - 0.02;
-				lax = (tbx + tcx) / 2 + 0.03125;//calculate line label a and b
-				lay = (tby + tcy) / 2;
-				lbx = (tax + tcx) / 2 - 0.03125;
-				lby = (tay + tcy) / 2;
+				lax = (tbx + tcx) / 2 - 0.03125 * (tby - tcy);//calculate line label a and b
+				lay = (tby + tcy) / 2 + 0.03125 * (tbx - tcx);
+				lbx = (tax + tcx) / 2 + 0.03125 * (tay - tcy);
+				lby = (tay + tcy) / 2 - 0.03125 * (tax - tcx);
 			}
 			lCx = tcx;//calculate point label C
 			lCy = tcy + 0.0225;
 			lcx = (tax + tbx) / 2;//calculate line label c
-			lcy = (tay + tby) / 2 - 0.02;
+			lcy = (tay + tby) / 2 - 0.03;
 
 		}
 		lhx = tcx + 0.02;//calculate line label h
-		lhy = (tay + tcy)/2;
+		lhy = (tay + tcy)/2 + 0.02;
 
 		DrawText(Text_A, lAx, lAy, NULL, 1);//draw labels on the triangle
 		DrawText(Text_B, lBx, lBy, NULL, 1);
@@ -449,6 +465,8 @@ void GetDisplay(void){//get display
 void Clicked(long int x, long int y){//x and y positions clicked
 	MouseX = (double)(x) / maxside;//set x and y position of mouse from square normalised
 	MouseY = (double)(y) / maxside;
+	lmx = MouseX;//set last mouse click position 
+	lmy = MouseY;
 	return;//exit function
 }
 
@@ -489,6 +507,14 @@ void Draged(void){
 		
 		pointa.p.known = 1;//only trust points
 		Calculate();//recalculate triangle
+	}
+	else if (MouseY < 0.75 * hs){//if in right range
+		double lastx = ix;
+		double lasty = iy;
+		ix = lastx - (lmx - MouseX); //set image x and y
+		iy = lasty - (lmy - MouseY);
+		lmx = MouseX;//set last mouse moved position 
+		lmy = MouseY;
 	}
 	return;//exit function
 }
@@ -709,6 +735,28 @@ void Resize(void){//recalculate numbers related to size and load texts
 
 
 void DrawBase(void){//draw basic stuff
+	if (Background != NULL){//if there is a background
+		SDL_Rect dest;
+		int w, h, access;//value to fill up
+		long format;
+		SDL_QueryTexture(Background, &format, &access, &w, &h);//get text box size
+		dest.w = (int)w * scale;//set width and height
+		dest.h = (int)h * scale;
+		dest.x = (int)(ix * maxside);//set x and y
+		dest.y = (int)(iy * maxside);
+
+		dest.x = dest.x - dest.w / 2;//set x and y centered to x and y
+		dest.y = dest.y - dest.h / 2;
+
+		SDL_RenderCopy(renderer, Background, NULL, &dest);//draw texture
+	}
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);//draw white
+	SDL_Rect rect;//rectangle to draw
+	rect.w = (int)(ws * maxside);//set width and height
+	rect.h = (int)(hs * 0.25 * maxside);
+	rect.x = 0;//set x and y
+	rect.y = (int)(0.75 * maxside);
+	SDL_RenderFillRect(renderer, &rect);//draw rectangle to mask bottom
 }
 
 

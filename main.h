@@ -28,7 +28,7 @@
 
 #define PEN_SIZE 0.0078125
 #define CLICK_RANGE 0.05
-#define RADIAN 0.0174532925
+#define DEGREE 57.295779513
 
 #define WINDOW_NAME "Trigonometry"
 #define DELAY 10 //default delay
@@ -62,6 +62,8 @@ unsigned long int fps;//frames per second
 
 SDL_Texture *somethingwentwrong;//image to display if something goes wrong
 
+SDL_Texture *Background;//image to display on background
+
 
 
 
@@ -73,6 +75,11 @@ SDL_Texture *Text_b;
 SDL_Texture *Text_c;
 SDL_Texture *Text_h;
 SDL_Texture *pen;//pen to draw with
+
+
+double ix, iy;//image x and y
+
+double lmx, lmy;//last mouse position
 
 double tax, tay, tbx, tby, tcx, tcy;//triangle that will be drawn on screen
 
@@ -96,7 +103,7 @@ typedef struct line{
 }Line;
 
 typedef struct angle{
-	double a;//angle in degrees
+	double a;//angle in radians
 	int priority;//priority of this value
 	int known;//if value is certain
 }Angle;
@@ -114,7 +121,7 @@ Value lineh;//height of triangle
 
 Value *Selected;//selected object
 
-int rad;//if in radians
+int deg;//if in degrees
 
 
 
