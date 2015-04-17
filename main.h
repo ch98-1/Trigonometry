@@ -16,7 +16,7 @@
 #define FULLLSCREEN //define if fullscreen
 //#define FPS //print out fps
 
-#ifdef FULLLSCREEN 
+#ifdef FULLLSCREEN
 #define WINDOWFLAGS SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_BORDERLESS        //fullscreen borderless window
 #define WIDTH display.w //width and height of window
 #define HEIGHT display.h
@@ -29,6 +29,9 @@
 #define PEN_SIZE 0.0078125
 #define CLICK_RANGE 0.05
 #define DEGREE 57.295779513
+#define DEGREESIGN 176
+#define PI 3.14159265358979323846
+#define TEXT_INPUT_SHIFT -0.5 //y shift when inputting text
 
 #define WINDOW_NAME "Trigonometry"
 #define DELAY 10 //default delay
@@ -66,6 +69,18 @@ SDL_Texture *Background;//image to display on background
 
 
 
+SDL_Texture *Angle_A;//textures for angle and line values
+SDL_Texture *Angle_B;
+SDL_Texture *Angle_C;
+SDL_Texture *Line_a;
+SDL_Texture *Line_b;
+SDL_Texture *Line_c;
+SDL_Texture *Line_h;
+SDL_Texture *Area;//text for area values
+
+
+SDL_Texture *DEG_RAD;//if using degrees or radians
+
 
 SDL_Texture *Text_A;//text for labels
 SDL_Texture *Text_B;
@@ -88,6 +103,8 @@ double lAx, lAy, lBx, lBy, lCx, lCy, lax, lay, lbx, lby, lcx, lcy, lhx, lhy;//ce
 double scale;//scale up or down
 double xshift;//shift in x direction
 double yshift;//shift in y direction
+double XShiftAll;//shift everything drawn in x direction
+double YShiftAll;//shift everything drawn in x direction
 
 
 
@@ -119,7 +136,9 @@ Value linea, lineb, linec;//line a, b and c of triangle to calculate on
 Value anglea, angleb, anglec;//angle a, b and c of triangle to calculate on
 Value lineh;//height of triangle
 
-Value *Selected;//selected object
+Value *Selected;//selected object being edited
+
+char SelectedValue[1024];//selected value
 
 int deg;//if in degrees
 

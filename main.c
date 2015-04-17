@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
 	//filter events
 	SDL_SetEventFilter(EventFilter, NULL);
 
-	
+
 	//quit SDL at exit
 	atexit(Quit);
 
@@ -74,6 +74,7 @@ int main(int argc, char *argv[]){
 
 
 	//initialise and load stuff
+	deg = 1;//in degrees at default
 	delay = DELAY;//10 ms delay
 	somethingwentwrong = GetTextTexture(font_64, "somethingwentwrong", 0, 0, 0);//image to display if something went wrong
 
@@ -86,6 +87,8 @@ int main(int argc, char *argv[]){
 	SDL_DestroyTexture(loading);//don't need this texture
 
 	//set initial values
+	XShiftAll = 0;//no shift for now
+	YShiftAll = 0;
 	ix = 0.5 * ws;//image width and height
 	iy = 0.5 * hs;
 	pointa.p.x = PAX;//triangle default
@@ -130,6 +133,7 @@ int main(int argc, char *argv[]){
 	}
 
 	Resize();//reload display
+	Calculate();//calculate values of the triangle
 
 
 
@@ -194,10 +198,10 @@ int main(int argc, char *argv[]){
 		tcy = pointc.p.y * scale + yshift;
 
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);//draw red for height
-		SDL_RenderDrawLine(renderer, tcx * maxside, tay * maxside, tcx * maxside, tcy * maxside);//height line
+		SDL_RenderDrawLine(renderer, tcx * maxside + XShiftAll * maxside, tay * maxside + YShiftAll * maxside, tcx * maxside + XShiftAll * maxside, tcy * maxside + YShiftAll * maxside);//height line
 		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);//draw blue for height
-		SDL_RenderDrawLine(renderer, tax * maxside, tay * maxside, tcx * maxside, tay * maxside);//base extension line
-		SDL_RenderDrawLine(renderer, tbx * maxside, tby * maxside, tcx * maxside, tby * maxside);//base extansion line
+		SDL_RenderDrawLine(renderer, tax * maxside + XShiftAll * maxside, tay * maxside + YShiftAll * maxside, tcx * maxside + XShiftAll * maxside, tay * maxside + YShiftAll * maxside);//base extension line
+		SDL_RenderDrawLine(renderer, tbx * maxside + XShiftAll * maxside, tby * maxside + YShiftAll * maxside, tcx * maxside + XShiftAll * maxside, tby * maxside + YShiftAll * maxside);//base extansion line
 
 		if (tay > tcy){//if c is above a
 			if (tax > tbx){//if a is right of b
@@ -265,6 +269,17 @@ int main(int argc, char *argv[]){
 		DrawText(Text_h, lhx, lhy, NULL, 1);
 
 		DrawTriangle(tax, tay, tbx, tby, tcx, tcy);//draw triangle
+
+		DrawText(Line_a, 0, 0.8 * hs, NULL, 0);//draw values
+		DrawText(Line_b, 0, ((0.2 * hs) / 3) + 0.8 * hs, NULL, 0);
+		DrawText(Line_c, 0, ((0.2 * hs) / 3) * 2 + 0.8 * hs, NULL, 0);
+		DrawText(Angle_A, (ws / 3), 0.8 * hs, NULL, 0);
+		DrawText(Angle_B, (ws / 3), ((0.2 * hs) / 3) + 0.8 * hs, NULL, 0);
+		DrawText(Angle_C, (ws / 3), ((0.2 * hs) / 3) * 2 + 0.8 * hs, NULL, 0);
+		DrawText(Line_h, (ws / 3) * 2, 0.8 * hs, NULL, 0);
+		DrawText(Area, (ws / 3) * 2, ((0.2 * hs) / 3) * 1 + 0.8 * hs, NULL, 0);
+		DrawText(DEG_RAD, (ws / 3) * 2, ((0.2 * hs) / 3) * 2 + 0.8 * hs, NULL, 0);//draw deg/rad button
+
 
 
 
@@ -373,6 +388,16 @@ void Quit(void){//quit everything
 	SDL_DestroyTexture(Text_b);
 	SDL_DestroyTexture(Text_c);
 	SDL_DestroyTexture(Text_h);
+	SDL_DestroyTexture(Angle_A);
+	SDL_DestroyTexture(Angle_B);
+	SDL_DestroyTexture(Angle_C);
+	SDL_DestroyTexture(Line_a);
+	SDL_DestroyTexture(Line_b);
+	SDL_DestroyTexture(Line_c);
+	SDL_DestroyTexture(Line_h);
+	SDL_DestroyTexture(DEG_RAD);
+	SDL_DestroyTexture(Area);
+	SDL_DestroyTexture(pen);
 
 
 
@@ -467,6 +492,20 @@ void Clicked(long int x, long int y){//x and y positions clicked
 	MouseY = (double)(y) / maxside;
 	lmx = MouseX;//set last mouse click position 
 	lmy = MouseY;
+	if (MouseY > ((0.2  *hs) / 3) * 2 + 0.8*  hs && MouseY < ((0.2 * hs) / 3) * 2 + 0.8 * hs + (1.0 / 24) && MouseX > (ws / 3) * 2 && MouseX < (ws / 3) * 2 + 0.1){//if within range of DEG/RAD button
+		SDL_DestroyTexture(DEG_RAD);//destroy button texture
+		if (deg){//if in degrees
+			DEG_RAD = GetTextTexture(font_24, "RAD", 0, 0, 0);//now in radians
+			deg = 0;//not in degrees
+			Calculate();//recalculate values
+		}
+		else{//if in radians
+			DEG_RAD = GetTextTexture(font_24, "DEG", 0, 0, 0);//now in degrees
+			deg = 1;//not in degrees
+			Calculate();//recalculate values
+		}
+	}
+	
 	return;//exit function
 }
 
@@ -700,6 +739,22 @@ void Resize(void){//recalculate numbers related to size and load texts
 		SDL_DestroyTexture(Text_b);
 		SDL_DestroyTexture(Text_c);
 		SDL_DestroyTexture(Text_h);
+		SDL_DestroyTexture(Angle_A);
+		SDL_DestroyTexture(Angle_B);
+		SDL_DestroyTexture(Angle_C);
+		SDL_DestroyTexture(Line_a);
+		SDL_DestroyTexture(Line_b);
+		SDL_DestroyTexture(Line_c);
+		SDL_DestroyTexture(Line_h);
+		SDL_DestroyTexture(DEG_RAD);
+		SDL_DestroyTexture(Area);
+
+		if (deg){//if in deg
+			DEG_RAD = GetTextTexture(font_24, "DEG", 0, 0, 0);//get texture  as deg
+		}
+		else{//if in rad
+			DEG_RAD = GetTextTexture(font_24, "RAD", 0, 0, 0);//get texture as rad
+		}
 
 		Text_A = GetTextTexture(font_32, "A", 0, 0, 0);//create new textures of the labels
 		Text_B = GetTextTexture(font_32, "B", 0, 0, 0);
@@ -708,6 +763,43 @@ void Resize(void){//recalculate numbers related to size and load texts
 		Text_b = GetTextTexture(font_32, "b", 0, 0, 0);
 		Text_c = GetTextTexture(font_32, "c", 0, 0, 0);
 		Text_h = GetTextTexture(font_32, "h", 0, 0, 0);
+
+
+		char Line_a_Text[256];//text to display
+		char Line_b_Text[256];
+		char Line_c_Text[256];
+		char Line_h_Text[256];
+		char Angle_A_Text[256];
+		char Angle_B_Text[256];
+		char Angle_C_Text[256];
+		char Area_Text[256];
+
+		unsigned char DegreeSign;//character for degree sign
+		if (deg){//if in degrees
+			DegreeSign = DEGREESIGN;//put degree sign on
+		}
+		else{//if in radians
+			DegreeSign = ' ';//no degree sign
+		}
+
+		sprintf(Line_a_Text, "a: %.5f", linea.l.l);//format texts to display
+		sprintf(Line_b_Text, "b: %.5f", lineb.l.l);
+		sprintf(Line_c_Text, "c: %.5f", linec.l.l);
+		sprintf(Line_h_Text, "h: %.5f", lineh.l.l);
+		sprintf(Angle_A_Text, "A: %.5f%c", pow(DEGREE, deg)*anglea.a.a, DegreeSign);//add degrees sign
+		sprintf(Angle_B_Text, "B: %.5f%c", pow(DEGREE, deg)*angleb.a.a, DegreeSign);
+		sprintf(Angle_C_Text, "C: %.5f%c", pow(DEGREE, deg)*anglec.a.a, DegreeSign);
+		sprintf(Area_Text, "Area: %.5f", lineh.l.l * linec.l.l);//area
+
+		Line_a = GetTextTexture(font_24, Line_a_Text, 0, 0, 0);//make textures for each value
+		Line_b = GetTextTexture(font_24, Line_b_Text, 0, 0, 0);
+		Line_c = GetTextTexture(font_24, Line_c_Text, 0, 0, 0);
+		Line_h = GetTextTexture(font_24, Line_h_Text, 0, 0, 0);
+		Angle_A = GetTextTexture(font_24, Angle_A_Text, 0, 0, 0);
+		Angle_B = GetTextTexture(font_24, Angle_B_Text, 0, 0, 0);
+		Angle_C = GetTextTexture(font_24, Angle_C_Text, 0, 0, 0);
+		Area = GetTextTexture(font_24, Area_Text, 0, 0, 0);
+
 
 	}
 }
@@ -747,6 +839,9 @@ void DrawBase(void){//draw basic stuff
 
 		dest.x = dest.x - dest.w / 2;//set x and y centered to x and y
 		dest.y = dest.y - dest.h / 2;
+
+		dest.x += XShiftAll * maxside;//shift x and y
+		dest.y += YShiftAll * maxside;
 
 		SDL_RenderCopy(renderer, Background, NULL, &dest);//draw texture
 	}
@@ -803,6 +898,9 @@ void DrawText(SDL_Texture *texture, double x, double y, SDL_Rect *rect, int cent
 		dest.y = dest.y - dest.h / 2;
 	}
 
+	dest.x += XShiftAll * maxside;//shift x and y
+	dest.y += YShiftAll * maxside;
+
 	SDL_RenderCopy(renderer, texture, rect, &dest);//draw texture
 
 }
@@ -846,6 +944,9 @@ void DrawIMG(SDL_Texture *texture, double x, double y, SDL_Rect *rect, double w,
 		dest.x = dest.x - dest.w / 2;//set x and y centered to x and y
 		dest.y = dest.y - dest.h / 2;
 	}
+
+	dest.x += XShiftAll * maxside;//shift x and y
+	dest.y += YShiftAll * maxside;
 
 	SDL_RenderCopy(renderer, texture, rect, &dest);//draw texture
 
@@ -929,6 +1030,7 @@ void GetKnown(void){//recalculate known points
 	}
 
 
+
 }
 
 
@@ -958,8 +1060,75 @@ void Calculate(void){//calculate values in the triangle
 		lineb.l.l = hypot(pointa.p.x - pointc.p.x, pointa.p.y - pointc.p.y);
 		linec.l.l = hypot(pointb.p.x - pointa.p.x, pointb.p.y - pointa.p.y);
 		lineh.l.l = fabs(pointc.p.y - pointa.p.y);//get height
+		anglea.a.a = acos((lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - linea.l.l * linea.l.l) / fabs(2 * lineb.l.l*linec.l.l));//get angles
+		angleb.a.a = acos((linea.l.l * linea.l.l + linec.l.l * linec.l.l - lineb.l.l * lineb.l.l) / fabs(2 * linea.l.l*linec.l.l));
+		anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
 	}
 
+
+
+
+
+
+
+
+
+
+
+	SDL_DestroyTexture(Angle_A);//destroy textures to rewrite
+	SDL_DestroyTexture(Angle_B);
+	SDL_DestroyTexture(Angle_C);
+	SDL_DestroyTexture(Line_a);
+	SDL_DestroyTexture(Line_b);
+	SDL_DestroyTexture(Line_c);
+	SDL_DestroyTexture(Line_h);
+	SDL_DestroyTexture(Area);
+
+	char Line_a_Text[256];//text to display
+	char Line_b_Text[256];
+	char Line_c_Text[256];
+	char Line_h_Text[256];
+	char Angle_A_Text[256];
+	char Angle_B_Text[256];
+	char Angle_C_Text[256];
+	char Area_Text[256];
+	
+	unsigned char DegreeSign;//character for degree sign
+	if (deg){//if in degrees
+		DegreeSign = DEGREESIGN;//put degree sign on
+	}
+	else{//if in radians
+		DegreeSign = ' ';//no degree sign
+	}
+
+	sprintf(Line_a_Text, "a: %.5f", linea.l.l);//format texts to display
+	sprintf(Line_b_Text, "b: %.5f", lineb.l.l);
+	sprintf(Line_c_Text, "c: %.5f", linec.l.l);
+	sprintf(Line_h_Text, "h: %.5f", lineh.l.l);
+	sprintf(Angle_A_Text, "A: %.5f%c", pow(DEGREE, deg)*anglea.a.a, DegreeSign);//add degrees sign
+	sprintf(Angle_B_Text, "B: %.5f%c", pow(DEGREE, deg)*angleb.a.a, DegreeSign);
+	sprintf(Angle_C_Text, "C: %.5f%c", pow(DEGREE, deg)*anglec.a.a, DegreeSign);
+	sprintf(Area_Text, "Area: %.5f", lineh.l.l * linec.l.l);//area
+
+	Line_a = GetTextTexture(font_24, Line_a_Text, 0, 0, 0);//make textures for each value
+	Line_b = GetTextTexture(font_24, Line_b_Text, 0, 0, 0);
+	Line_c = GetTextTexture(font_24, Line_c_Text, 0, 0, 0);
+	Line_h = GetTextTexture(font_24, Line_h_Text, 0, 0, 0);
+	Angle_A = GetTextTexture(font_24, Angle_A_Text, 0, 0, 0);
+	Angle_B = GetTextTexture(font_24, Angle_B_Text, 0, 0, 0);
+	Angle_C = GetTextTexture(font_24, Angle_C_Text, 0, 0, 0);
+	Area = GetTextTexture(font_24, Area_Text, 0, 0, 0);
+
+	pointa.p.known = 0;//reset known points
+	pointb.p.known = 0;
+	pointc.p.known = 0;
+	linea.l.known = 0;
+	lineb.l.known = 0;
+	linec.l.known = 0;
+	anglea.a.known = 0;
+	angleb.a.known = 0;
+	anglec.a.known = 0;
+	lineh.l.known = 0;
 }
 
 
