@@ -137,7 +137,7 @@ Value anglea, angleb, anglec;//angle a, b and c of triangle to calculate on
 Value lineh;//height of triangle
 
 Value *Selected;//selected object being edited
-SDL_Texture *SelectedTexture;//selected texture
+SDL_Texture **SelectedTexture;//selected texture
 
 char SelectedValue[1024];//selected value
 

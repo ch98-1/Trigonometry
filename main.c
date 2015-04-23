@@ -159,23 +159,25 @@ int main(int argc, char *argv[]){
 				Resize();//resize stuff
 				break;//get out
 			case SDL_TEXTINPUT://when text is inputed
+				if (strlen(SelectedValue) > 200) break;//if selected value get's too big
 				strcat(SelectedValue, e.text.text);//get text
-				SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-				SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get that text
+				SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+				*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get that text
 				break;//get out
 			case SDL_TEXTEDITING://when editing text
 				strcpy(str, SelectedValue);//get values
 				strcat(str, e.edit.text);
 				if (strlen(str) == 0) break;//nothing in string
-				SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-				SelectedTexture = GetTextTexture(font_24, str, 0, 0, 0);//get that text
+				SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+				*SelectedTexture = GetTextTexture(font_24, str, 0, 0, 0);//get that text
 				break;
 			case SDL_KEYDOWN://key is down
 				if (e.key.keysym.sym == SDLK_BACKSPACE){//if backspace is pressed
 					if (Selected != NULL){//if something is still selected
+						if (strlen(SelectedValue) <= 2) break;//deleted too much
 						SelectedValue[strlen(SelectedValue) - 1] = '\0';//clear last caracter
-						SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-						SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get that text
+						SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+						*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get that text
 					}
 				}
 				else if (e.key.keysym.sym == SDLK_RETURN || e.key.keysym.sym == SDLK_RETURN2 || e.key.keysym.sym == SDLK_KP_ENTER){//if return is pressed
@@ -560,55 +562,55 @@ void Clicked(long int x, long int y){//x and y positions clicked
 		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
 		SDL_StartTextInput();//start text input events
 		Selected = &linea;//line a is selected
-		SelectedTexture = Line_a;//set texture
+		SelectedTexture = &Line_a;//set texture
 		strcpy(SelectedValue, "a: ");//reset string
-		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+		SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+		*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
 	}
 	else if (MouseY >((0.2  *hs) / 3) * 1 + 0.8 * hs + YShiftAll && MouseY < ((0.2  *hs) / 3) * 1 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX > 0 + XShiftAll && MouseX < 0.3 + XShiftAll){//if within range of value b
 		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
 		SDL_StartTextInput();//start text input events
 		Selected = &lineb;//line b is selected
-		SelectedTexture = Line_b;//set texture
+		SelectedTexture = &Line_b;//set texture
 		strcpy(SelectedValue, "b: ");//reset string
-		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+		SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+		*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
 	}
 	else if (MouseY >((0.2  *hs) / 3) * 2 + 0.8 * hs + YShiftAll && MouseY < ((0.2  *hs) / 3) * 2 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX > 0 + XShiftAll && MouseX < 0.3 + XShiftAll){//if within range of value c
 		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
 		SDL_StartTextInput();//start text input events
 		Selected = &linec;//line c is selected
-		SelectedTexture = Line_c;//set texture
+		SelectedTexture = &Line_c;//set texture
 		strcpy(SelectedValue, "c: ");//reset string
-		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+		SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+		*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
 	}
 	else if (MouseY > 0.8*  hs + YShiftAll && MouseY < 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX >(ws / 3) * 1 + XShiftAll && MouseX < (ws / 3) * 1 + 0.3 + XShiftAll){//if within range of value A
 		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
 		SDL_StartTextInput();//start text input events
 		Selected = &anglea;//angle a is selected
-		SelectedTexture = Angle_A;//set texture
+		SelectedTexture = &Angle_A;//set texture
 		strcpy(SelectedValue, "A: ");//reset string
-		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+		SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+		*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
 	}
 	else if (MouseY >((0.2  *hs) / 3) * 1 + 0.8 * hs + YShiftAll && MouseY < ((0.2 * hs) / 3) * 1 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX >(ws / 3) * 1 + XShiftAll && MouseX < (ws / 3) * 1 + 0.3 + XShiftAll){//if within range of value B
 		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
 		SDL_StartTextInput();//start text input events
 		Selected = &angleb;//angle b is selected
-		SelectedTexture = Angle_B;//set texture
+		SelectedTexture = &Angle_B;//set texture
 		strcpy(SelectedValue, "B: ");//reset string
-		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+		SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+		*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
 	}
 	else if (MouseY >((0.2  *hs) / 3) * 2 + 0.8 * hs + YShiftAll && MouseY < ((0.2 * hs) / 3) * 2 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX >(ws / 3) * 1 + XShiftAll && MouseX < (ws / 3) * 1 + 0.3 + XShiftAll){//if within range of value C
 		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
 		SDL_StartTextInput();//start text input events
 		Selected = &anglec;//angle c is selected
-		SelectedTexture = Angle_C;//set texture
+		SelectedTexture = &Angle_C;//set texture
 		strcpy(SelectedValue, "C: ");//reset string
-		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
-		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+		SDL_DestroyTexture(*SelectedTexture);//destroy selected texture
+		*SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
 	}
 	else if (SDL_IsTextInputActive){//if something is still selected
 		SDL_StopTextInput();//end text input
@@ -616,6 +618,7 @@ void Clicked(long int x, long int y){//x and y positions clicked
 		SelectedTexture = NULL;
 		XShiftAll = 0;//no shifts
 		YShiftAll = 0;
+		Calculate();//recalculate triangle
 	}
 	
 	return;//exit function
