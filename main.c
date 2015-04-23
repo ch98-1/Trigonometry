@@ -1173,10 +1173,49 @@ void GetKnown(void){//recalculate known points
 		angleb.a.known = 0;
 		anglec.a.known = 0;
 		lineh.l.known = 0;
+		return;//end of function
 	}
-
-
-
+	if (linea.l.priority == 0 || linea.l.priority == 1 || linea.l.priority == 2){//if within top 3 priority
+		linea.l.known = 1;//set as known
+	}
+	if (lineb.l.priority == 0 || lineb.l.priority == 1 || lineb.l.priority == 2){//if within top 3 priority
+		lineb.l.known = 1;//set as known
+	}
+	if (linec.l.priority == 0 || linec.l.priority == 1 || linec.l.priority == 2){//if within top 3 priority
+		linec.l.known = 1;//set as known
+	}
+	if (anglea.a.priority == 0 || anglea.a.priority == 1 || anglea.a.priority == 2){//if within top 3 priority
+		anglea.a.known = 1;//set as known
+	}
+	if (angleb.a.priority == 0 || angleb.a.priority == 1 || angleb.a.priority == 2){//if within top 3 priority
+		angleb.a.known = 1;//set as known
+	}
+	if (anglec.a.priority == 0 || anglec.a.priority == 1 || anglec.a.priority == 2){//if within top 3 priority
+		anglec.a.known = 1;//set as known
+	}
+	
+	if (anglea.a.known && angleb.a.known && anglec.a.known){//if all 3 angles are known
+		if (linea.l.priority == 3){//set 4th one to known
+			linea.l.known = 1;
+		}
+		if (lineb.l.priority == 3){
+			lineb.l.known = 1;
+		}
+		if (linec.l.priority == 3){
+			linec.l.known = 1;
+		}
+		if (anglea.a.priority == 2){//set 3rd one to unknown
+			anglea.a.known = 0;
+		}
+		if (angleb.a.priority == 2){
+			angleb.a.known = 0;
+		}
+		if (anglec.a.priority == 2){
+			anglec.a.known = 0;
+		}
+	}
+	//printf("anglea %d %d, angleb %d %d, anglec %d %d, linea %d %d, lineb %d %d, linec %d %d\n", anglea.a.priority, anglea.a.known, angleb.a.priority, angleb.a.known, anglec.a.priority, anglec.a.known, linea.l.priority, linea.l.known, lineb.l.priority, lineb.l.known, linec.l.priority, linec.l.known);//print out priority and known
+	return;//end of function
 }
 
 
@@ -1209,6 +1248,12 @@ void Calculate(void){//calculate values in the triangle
 		anglea.a.a = acos((lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - linea.l.l * linea.l.l) / fabs(2 * lineb.l.l*linec.l.l));//get angles
 		angleb.a.a = acos((linea.l.l * linea.l.l + linec.l.l * linec.l.l - lineb.l.l * lineb.l.l) / fabs(2 * linea.l.l*linec.l.l));
 		anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
+	}
+	else if (linea.l.known && lineb.l.known && linec.l.known){//if lines are known
+		anglea.a.a = acos((lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - linea.l.l * linea.l.l) / fabs(2 * lineb.l.l*linec.l.l));//get angles
+		angleb.a.a = acos((linea.l.l * linea.l.l + linec.l.l * linec.l.l - lineb.l.l * lineb.l.l) / fabs(2 * linea.l.l*linec.l.l));
+		anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
+		GetPoints();//get points
 	}
 
 
@@ -1275,6 +1320,60 @@ void Calculate(void){//calculate values in the triangle
 	angleb.a.known = 0;
 	anglec.a.known = 0;
 	lineh.l.known = 0;
+
+	return;//end of function
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void GetPoints(void){//get points from angle and value
+	if (pointa.p.x < pointb.p.x){//if last point a is left of point b
+		pointa.p.x = 0;//set point a as 0, 0
+		pointa.p.y = 0;
+		pointb.p.x = linec.l.l;//set point b
+		if (pointc.p.y >= pointa.p.y){//if c is below a
+			pointc.p.x = lineb.l.l * cos(anglea.a.a);//get x and y of point c
+			pointc.p.y = lineb.l.l * sin(anglea.a.a);
+		}
+		else{//if c is above a
+			pointc.p.x = lineb.l.l * cos(anglea.a.a);//get x and y of point c
+			pointc.p.y = -lineb.l.l * sin(anglea.a.a);
+		}
+	}
+	else {//if last point a is right of point b
+		pointb.p.x = 0;//set point b as 0, 0
+		pointb.p.y = 0;
+		pointa.p.x = linec.l.l;//set point a
+		if (pointc.p.y >= pointa.p.y){//if c is below a
+			pointc.p.x = linea.l.l * cos(angleb.a.a);//get x and y of point c
+			pointc.p.y = linea.l.l * sin(angleb.a.a);
+		}
+		else{//if c is above a
+			pointc.p.x = linea.l.l * cos(angleb.a.a);//get x and y of point c
+			pointc.p.y = -linea.l.l * sin(angleb.a.a);
+		}
+	}
+	return;//end of function
 }
 
 

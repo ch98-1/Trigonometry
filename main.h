@@ -181,5 +181,6 @@ void DrawLine(double ax, double ay, double bx, double by);//draw line for those 
 void GetKnown(void);//recalculate known values
 void Calculate(void);//calculate values in the triangle
 int IsLine(Value *value);//check if value is any of 3 lines
+void GetPoints(void);//get points from angle and value
 
 #endif
