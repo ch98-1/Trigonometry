@@ -31,7 +31,7 @@
 #define DEGREE 57.295779513
 #define DEGREESIGN 176
 #define PI 3.14159265358979323846
-#define TEXT_INPUT_SHIFT -0.5 //y shift when inputting text
+#define TEXT_INPUT_SHIFT -0.5 * hs //y shift when inputting text
 
 #define WINDOW_NAME "Trigonometry"
 #define DELAY 10 //default delay
@@ -54,7 +54,7 @@
 
 SDL_Window *window;//sdl window
 SDL_Renderer *renderer;//sdl renderer
-SDL_Event event;//event
+SDL_Event e;//event
 
 int width, height, maxside;//width and hight and smallest of 2 side of window
 double ws, hs;//width and height scaled to maxside
@@ -137,6 +137,7 @@ Value anglea, angleb, anglec;//angle a, b and c of triangle to calculate on
 Value lineh;//height of triangle
 
 Value *Selected;//selected object being edited
+SDL_Texture *SelectedTexture;//selected texture
 
 char SelectedValue[1024];//selected value
 
@@ -179,5 +180,6 @@ void DrawTriangle(double ax, double ay, double bx, double by, double cx, double 
 void DrawLine(double ax, double ay, double bx, double by);//draw line for those points with 1 as maxside
 void GetKnown(void);//recalculate known values
 void Calculate(void);//calculate values in the triangle
+int IsLine(Value *value);//check if value is any of 3 lines
 
 #endif

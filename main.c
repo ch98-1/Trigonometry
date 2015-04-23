@@ -87,7 +87,7 @@ int main(int argc, char *argv[]){
 	SDL_DestroyTexture(loading);//don't need this texture
 
 	//set initial values
-	XShiftAll = 0;//no shift for now
+	XShiftAll = 0;//no shifts for now
 	YShiftAll = 0;
 	ix = 0.5 * ws;//image width and height
 	iy = 0.5 * hs;
@@ -115,7 +115,6 @@ int main(int argc, char *argv[]){
 	anglec.a.known = 0;
 	lineh.l.known = 0;
 
-
 	//load textures
 	pen = GetTexture("pen.png");//get pen texture
 	Background = NULL;//no background
@@ -140,23 +139,75 @@ int main(int argc, char *argv[]){
 
 	//main loop
 	while (1) {
-		while (SDL_PollEvent(&event)) {//for each event
-			switch (event.type) {//for each event type
+		while (SDL_PollEvent(&e)) {//for each e
+			char str[1024];//string to fill for values
+			switch (e.type) {//for each event type
 			case SDL_QUIT://quit everything
 				Quit();//quit everything
 				break;//get out
 			case SDL_MOUSEBUTTONDOWN://when clicking down
-				Clicked(event.button.x, event.button.y);//run clicked function 
+				Clicked(e.button.x, e.button.y);//run clicked function 
 				break;//get out
 			case SDL_MOUSEMOTION://when mouse moved
-				MouseX = (double)(event.button.x) / maxside;//set x and y position of mouse from square normalised
-				MouseY = (double)(event.button.y) / maxside;
-				if (event.button.button == SDL_BUTTON_LEFT || event.button.which == SDL_TOUCH_MOUSEID){//if mouse is pressed down
+				MouseX = (double)(e.button.x) / maxside;//set x and y position of mouse from square normalised
+				MouseY = (double)(e.button.y) / maxside;
+				if (e.button.button == SDL_BUTTON_LEFT || e.button.which == SDL_TOUCH_MOUSEID){//if mouse is pressed down
 					Draged();//run draged function 
 				}
 				break;//get out
 			case SDL_WINDOWEVENT://when window was changed
 				Resize();//resize stuff
+				break;//get out
+			case SDL_TEXTINPUT://when text is inputed
+				strcat(SelectedValue, e.text.text);//get text
+				SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+				SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get that text
+				break;//get out
+			case SDL_TEXTEDITING://when editing text
+				strcpy(str, SelectedValue);//get values
+				strcat(str, e.edit.text);
+				if (strlen(str) == 0) break;//nothing in string
+				SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+				SelectedTexture = GetTextTexture(font_24, str, 0, 0, 0);//get that text
+				break;
+			case SDL_KEYDOWN://key is down
+				if (e.key.keysym.sym == SDLK_BACKSPACE){//if backspace is pressed
+					if (Selected != NULL){//if something is still selected
+						SelectedValue[strlen(SelectedValue) - 1] = '\0';//clear last caracter
+						SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+						SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get that text
+					}
+				}
+				else if (e.key.keysym.sym == SDLK_RETURN || e.key.keysym.sym == SDLK_RETURN2 || e.key.keysym.sym == SDLK_KP_ENTER){//if return is pressed
+					if (Selected != NULL){//if something is still selected
+						SDL_StopTextInput();//end text input
+						if (IsLine(Selected)){//if selected object is a line
+							Selected->l.l = atof(SelectedValue + 2);//get selected value
+							if (anglea.a.priority < Selected->l.priority) anglea.a.priority++;//increment priority of everything before selected value
+							if (angleb.a.priority < Selected->l.priority) angleb.a.priority++;
+							if (anglec.a.priority < Selected->l.priority) anglec.a.priority++;
+							if (linea.l.priority < Selected->l.priority) linea.l.priority++;
+							if (lineb.l.priority < Selected->l.priority) lineb.l.priority++;
+							if (linec.l.priority < Selected->l.priority) linec.l.priority++;
+							Selected->l.priority = 0;//first priority
+						}
+						else{//if selected object is a angle
+							Selected->a.a = atof(SelectedValue + 2) / pow(DEGREE, deg);//get selected value
+							if (anglea.a.priority < Selected->a.priority) anglea.a.priority++;//increment priority of everything before selected value
+							if (angleb.a.priority < Selected->a.priority) angleb.a.priority++;
+							if (anglec.a.priority < Selected->a.priority) anglec.a.priority++;
+							if (linea.l.priority < Selected->a.priority) linea.l.priority++;
+							if (lineb.l.priority < Selected->a.priority) lineb.l.priority++;
+							if (linec.l.priority < Selected->a.priority) linec.l.priority++;
+							Selected->a.priority = 0;//first priority
+						}
+						Selected = NULL;//deselect
+						SelectedTexture = NULL;
+						XShiftAll = 0;//no shifts
+						YShiftAll = 0;
+						Calculate();//recalculate triangle
+					}
+				}
 				break;//get out
 			default://for everything else
 				//ignore event
@@ -492,7 +543,7 @@ void Clicked(long int x, long int y){//x and y positions clicked
 	MouseY = (double)(y) / maxside;
 	lmx = MouseX;//set last mouse click position 
 	lmy = MouseY;
-	if (MouseY > ((0.2  *hs) / 3) * 2 + 0.8*  hs && MouseY < ((0.2 * hs) / 3) * 2 + 0.8 * hs + (1.0 / 24) && MouseX > (ws / 3) * 2 && MouseX < (ws / 3) * 2 + 0.1){//if within range of DEG/RAD button
+	if (MouseY > ((0.2  *hs) / 3) * 2 + 0.8 * hs + YShiftAll && MouseY < ((0.2 * hs) / 3) * 2 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX >(ws / 3) * 2 + XShiftAll && MouseX < (ws / 3) * 2 + 0.1 + XShiftAll){//if within range of DEG/RAD button
 		SDL_DestroyTexture(DEG_RAD);//destroy button texture
 		if (deg){//if in degrees
 			DEG_RAD = GetTextTexture(font_24, "RAD", 0, 0, 0);//now in radians
@@ -504,6 +555,67 @@ void Clicked(long int x, long int y){//x and y positions clicked
 			deg = 1;//not in degrees
 			Calculate();//recalculate values
 		}
+	}
+	else if (MouseY > 0.8 * hs + YShiftAll && MouseY < 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX > 0 && MouseX < 0.3){//if within range of value a
+		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
+		SDL_StartTextInput();//start text input events
+		Selected = &linea;//line a is selected
+		SelectedTexture = Line_a;//set texture
+		strcpy(SelectedValue, "a: ");//reset string
+		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+	}
+	else if (MouseY >((0.2  *hs) / 3) * 1 + 0.8 * hs + YShiftAll && MouseY < ((0.2  *hs) / 3) * 1 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX > 0 + XShiftAll && MouseX < 0.3 + XShiftAll){//if within range of value b
+		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
+		SDL_StartTextInput();//start text input events
+		Selected = &lineb;//line b is selected
+		SelectedTexture = Line_b;//set texture
+		strcpy(SelectedValue, "b: ");//reset string
+		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+	}
+	else if (MouseY >((0.2  *hs) / 3) * 2 + 0.8 * hs + YShiftAll && MouseY < ((0.2  *hs) / 3) * 2 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX > 0 + XShiftAll && MouseX < 0.3 + XShiftAll){//if within range of value c
+		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
+		SDL_StartTextInput();//start text input events
+		Selected = &linec;//line c is selected
+		SelectedTexture = Line_c;//set texture
+		strcpy(SelectedValue, "c: ");//reset string
+		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+	}
+	else if (MouseY > 0.8*  hs + YShiftAll && MouseY < 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX >(ws / 3) * 1 + XShiftAll && MouseX < (ws / 3) * 1 + 0.3 + XShiftAll){//if within range of value A
+		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
+		SDL_StartTextInput();//start text input events
+		Selected = &anglea;//angle a is selected
+		SelectedTexture = Angle_A;//set texture
+		strcpy(SelectedValue, "A: ");//reset string
+		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+	}
+	else if (MouseY >((0.2  *hs) / 3) * 1 + 0.8 * hs + YShiftAll && MouseY < ((0.2 * hs) / 3) * 1 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX >(ws / 3) * 1 + XShiftAll && MouseX < (ws / 3) * 1 + 0.3 + XShiftAll){//if within range of value B
+		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
+		SDL_StartTextInput();//start text input events
+		Selected = &angleb;//angle b is selected
+		SelectedTexture = Angle_B;//set texture
+		strcpy(SelectedValue, "B: ");//reset string
+		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+	}
+	else if (MouseY >((0.2  *hs) / 3) * 2 + 0.8 * hs + YShiftAll && MouseY < ((0.2 * hs) / 3) * 2 + 0.8 * hs + (1.0 / 24) + YShiftAll && MouseX >(ws / 3) * 1 + XShiftAll && MouseX < (ws / 3) * 1 + 0.3 + XShiftAll){//if within range of value C
+		YShiftAll = TEXT_INPUT_SHIFT;//shift for text input
+		SDL_StartTextInput();//start text input events
+		Selected = &anglec;//angle c is selected
+		SelectedTexture = Angle_C;//set texture
+		strcpy(SelectedValue, "C: ");//reset string
+		SDL_DestroyTexture(SelectedTexture);//destroy selected texture
+		SelectedTexture = GetTextTexture(font_24, SelectedValue, 0, 0, 0);//get initial text
+	}
+	else if (SDL_IsTextInputActive){//if something is still selected
+		SDL_StopTextInput();//end text input
+		Selected = NULL;//deselect
+		SelectedTexture = NULL;
+		XShiftAll = 0;//no shifts
+		YShiftAll = 0;
 	}
 	
 	return;//exit function
@@ -1015,6 +1127,37 @@ void DrawLine(double ax, double ay, double bx, double by){//draw line for those 
 
 
 
+
+
+int IsLine(Value *value){//check if value is any of 3 lines
+	return(value == &linea || value == &lineb || value == &linec);//return true if one of 3 line
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void GetKnown(void){//recalculate known points
 	if (pointa.p.known || pointb.p.known || pointc.p.known){//if one of the points are known
 		pointa.p.known = 1;//only trust points
@@ -1054,7 +1197,7 @@ void GetKnown(void){//recalculate known points
 
 
 void Calculate(void){//calculate values in the triangle
-	GetKnown();
+	GetKnown();//recalculate known points
 	if (pointa.p.known && pointb.p.known && pointc.p.known){//if points are known
 		linea.l.l = hypot(pointb.p.x - pointc.p.x, pointb.p.y - pointc.p.y);//get lines
 		lineb.l.l = hypot(pointa.p.x - pointc.p.x, pointa.p.y - pointc.p.y);
@@ -1130,6 +1273,18 @@ void Calculate(void){//calculate values in the triangle
 	anglec.a.known = 0;
 	lineh.l.known = 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
