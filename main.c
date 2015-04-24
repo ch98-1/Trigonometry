@@ -1244,7 +1244,6 @@ void Calculate(void){//calculate values in the triangle
 		linea.l.l = hypot(pointb.p.x - pointc.p.x, pointb.p.y - pointc.p.y);//get lines
 		lineb.l.l = hypot(pointa.p.x - pointc.p.x, pointa.p.y - pointc.p.y);
 		linec.l.l = hypot(pointb.p.x - pointa.p.x, pointb.p.y - pointa.p.y);
-		lineh.l.l = fabs(pointc.p.y - pointa.p.y);//get height
 		anglea.a.a = acos((lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - linea.l.l * linea.l.l) / fabs(2 * lineb.l.l*linec.l.l));//get angles
 		angleb.a.a = acos((linea.l.l * linea.l.l + linec.l.l * linec.l.l - lineb.l.l * lineb.l.l) / fabs(2 * linea.l.l*linec.l.l));
 		anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
@@ -1255,8 +1254,76 @@ void Calculate(void){//calculate values in the triangle
 		anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
 		GetPoints();//get points
 	}
-
-
+	else{
+		if ((anglea.a.known && angleb.a.known) || (anglec.a.known && angleb.a.known) || (anglea.a.known && anglec.a.known)){//if two of the three angle is known
+			GetAngles();//get the third angle
+			if (linea.l.known){//if line a is known
+				lineb.l.l = sin(angleb.a.a) * (linea.l.l / sin(anglea.a.a));//get line b and c
+				linec.l.l = sin(anglec.a.a) * (linea.l.l / sin(anglea.a.a));
+			}
+			else if (lineb.l.known){//if line b is known
+				linea.l.l = sin(anglea.a.a) * (lineb.l.l / sin(angleb.a.a));//get line a and c
+				linec.l.l = sin(anglec.a.a) * (lineb.l.l / sin(angleb.a.a));
+			}
+			else if (linec.l.known){//if line c is known
+				linea.l.l = sin(anglea.a.a) * (linec.l.l / sin(anglec.a.a));//get line a and b
+				lineb.l.l = sin(angleb.a.a) * (linec.l.l / sin(anglec.a.a));
+			}
+		}
+		else if (linea.l.known && lineb.l.known) {//if line a and b is known
+			if (anglea.a.known){//if angle a is known
+				angleb.a.a = asin(lineb.l.l * (sin(anglea.a.a) / linea.l.l));//get angle b
+				anglec.a.a = PI - (anglea.a.a + angleb.a.a);//get angle c
+				linec.l.l = sqrt(linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - 2 * linea.l.l * lineb.l.l * cos(anglec.a.a));//get line c
+			}
+			else if (angleb.a.known){//if angle b is known
+				anglea.a.a = asin(linea.l.l * (sin(angleb.a.a) / lineb.l.l));//get angle a
+				anglec.a.a = PI - (anglea.a.a + angleb.a.a);//get angle c
+				linec.l.l = sqrt(linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - 2 * linea.l.l * lineb.l.l * cos(anglec.a.a));//get line c
+			}
+			else if (anglec.a.known){//if angle c is known
+				linec.l.l = sqrt(linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - 2 * linea.l.l * lineb.l.l * cos(anglec.a.a));//get line c
+				anglea.a.a = acos((lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - linea.l.l * linea.l.l) / fabs(2 * lineb.l.l*linec.l.l));//get angles
+				angleb.a.a = acos((linea.l.l * linea.l.l + linec.l.l * linec.l.l - lineb.l.l * lineb.l.l) / fabs(2 * linea.l.l*linec.l.l));
+			}
+		}
+		else if (linec.l.known && lineb.l.known) {//if line b and c is known
+			if (anglea.a.known){//if angle a is known
+				linea.l.l = sqrt(lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - 2 * lineb.l.l * linec.l.l * cos(anglea.a.a));//get line a
+				angleb.a.a = acos((linea.l.l * linea.l.l + linec.l.l * linec.l.l - lineb.l.l * lineb.l.l) / fabs(2 * linea.l.l*linec.l.l));//get angles
+				anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
+			}
+			else if (angleb.a.known){//if angle b is known
+				anglec.a.a = asin(linec.l.l * (sin(angleb.a.a) / lineb.l.l));//get angle c
+				anglea.a.a = PI - (anglec.a.a + angleb.a.a);//get angle a
+				linea.l.l = sqrt(lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - 2 * lineb.l.l * linec.l.l * cos(anglea.a.a));//get line a
+			}
+			else if (anglec.a.known){//if angle c is known
+				angleb.a.a = asin(lineb.l.l * (sin(anglec.a.a) / linec.l.l));//get angle b
+				anglea.a.a = PI - (anglec.a.a + angleb.a.a);//get angle a
+				linea.l.l = sqrt(lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - 2 * lineb.l.l * linec.l.l * cos(anglea.a.a));//get line a
+			}
+		}
+		else if(linea.l.known && linec.l.known){//if line a and c is known
+			if (anglea.a.known){//if angle a is known
+				anglec.a.a = asin(linea.l.l * (sin(anglea.a.a) / linea.l.l));//get angle c
+				angleb.a.a = PI - (anglea.a.a + anglec.a.a);//get angle b
+				lineb.l.l = sqrt(linea.l.l * linea.l.l + linec.l.l * linec.l.l - 2 * linea.l.l * linec.l.l * cos(angleb.a.a));//get line b
+			}
+			else if (angleb.a.known){//if angle b is known
+				lineb.l.l = sqrt(linea.l.l * linea.l.l + linec.l.l * linec.l.l - 2 * linea.l.l * linec.l.l * cos(angleb.a.a));//get line b
+				anglea.a.a = acos((lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - linea.l.l * linea.l.l) / fabs(2 * lineb.l.l*linec.l.l));//get angles
+				anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
+			}
+			else if (anglec.a.known){//if angle c is known
+				anglea.a.a = asin(linea.l.l * (sin(anglec.a.a) / linec.l.l));//get angle a
+				angleb.a.a = PI - (anglea.a.a + anglec.a.a);//get angle b
+				lineb.l.l = sqrt(linea.l.l * linea.l.l + linec.l.l * linec.l.l - 2 * linea.l.l * linec.l.l * cos(angleb.a.a));//get line b
+			}
+		}
+		GetPoints();//get points
+	}
+	lineh.l.l = fabs(pointc.p.y - pointa.p.y);//get height
 
 
 
@@ -1372,6 +1439,53 @@ void GetPoints(void){//get points from angle and value
 			pointc.p.x = linea.l.l * cos(angleb.a.a);//get x and y of point c
 			pointc.p.y = -linea.l.l * sin(angleb.a.a);
 		}
+	}
+	return;//end of function
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void GetAngles(void){//get the third angle
+	if (anglea.a.known && angleb.a.known){//if a and b are known
+		anglec.a.a = PI - (anglea.a.a + angleb.a.a);//get angle c
+		anglec.a.known = 1;//set anglec as known
+		return;//end of function
+	}
+	else if (angleb.a.known && anglec.a.known){//if b and c are known
+		anglea.a.a = PI - (angleb.a.a + anglec.a.a);//get angle a
+		anglea.a.known = 1;//set anglea as known
+		return;//end of function
+	}
+	else if (anglea.a.known && anglec.a.known){//if a and c are known
+		angleb.a.a = PI - (anglea.a.a + anglec.a.a);//get angle b
+		angleb.a.known = 1;//set anglea as known
+		return;//end of function
 	}
 	return;//end of function
 }
