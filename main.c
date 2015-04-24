@@ -184,7 +184,7 @@ int main(int argc, char *argv[]){
 					if (Selected != NULL){//if something is still selected
 						SDL_StopTextInput();//end text input
 						if (IsLine(Selected)){//if selected object is a line
-							Selected->l.l = atof(SelectedValue + 2);//get selected value
+							Selected->l.l = fabs(atof(SelectedValue + 2));//get selected value
 							if (anglea.a.priority < Selected->l.priority) anglea.a.priority++;//increment priority of everything before selected value
 							if (angleb.a.priority < Selected->l.priority) angleb.a.priority++;
 							if (anglec.a.priority < Selected->l.priority) anglec.a.priority++;
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]){
 							Selected->l.priority = 0;//first priority
 						}
 						else{//if selected object is a angle
-							Selected->a.a = atof(SelectedValue + 2) / pow(DEGREE, deg);//get selected value
+							Selected->a.a = fabs(fmod(atof(SelectedValue + 2) / pow(DEGREE, deg), PI));//get selected value
 							if (anglea.a.priority < Selected->a.priority) anglea.a.priority++;//increment priority of everything before selected value
 							if (angleb.a.priority < Selected->a.priority) angleb.a.priority++;
 							if (anglec.a.priority < Selected->a.priority) anglec.a.priority++;
@@ -1272,13 +1272,13 @@ void Calculate(void){//calculate values in the triangle
 		}
 		else if (linea.l.known && lineb.l.known) {//if line a and b is known
 			if (anglea.a.known){//if angle a is known
-				angleb.a.a = asin(lineb.l.l * (sin(anglea.a.a) / linea.l.l));//get angle b
-				anglec.a.a = PI - (anglea.a.a + angleb.a.a);//get angle c
+				angleb.a.a = fabs(asin(lineb.l.l * (sin(anglea.a.a) / linea.l.l)));//get angle b
+				anglec.a.a = fabs(PI - (anglea.a.a + angleb.a.a));//get angle c
 				linec.l.l = sqrt(linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - 2 * linea.l.l * lineb.l.l * cos(anglec.a.a));//get line c
 			}
 			else if (angleb.a.known){//if angle b is known
-				anglea.a.a = asin(linea.l.l * (sin(angleb.a.a) / lineb.l.l));//get angle a
-				anglec.a.a = PI - (anglea.a.a + angleb.a.a);//get angle c
+				anglea.a.a = fabs(asin(linea.l.l * (sin(angleb.a.a) / lineb.l.l)));//get angle a
+				anglec.a.a = fabs(PI - (anglea.a.a + angleb.a.a));//get angle c
 				linec.l.l = sqrt(linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - 2 * linea.l.l * lineb.l.l * cos(anglec.a.a));//get line c
 			}
 			else if (anglec.a.known){//if angle c is known
@@ -1294,20 +1294,20 @@ void Calculate(void){//calculate values in the triangle
 				anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
 			}
 			else if (angleb.a.known){//if angle b is known
-				anglec.a.a = asin(linec.l.l * (sin(angleb.a.a) / lineb.l.l));//get angle c
-				anglea.a.a = PI - (anglec.a.a + angleb.a.a);//get angle a
+				anglec.a.a = fabs(asin(linec.l.l * (sin(angleb.a.a) / lineb.l.l)));//get angle c
+				anglea.a.a = fabs(PI - (anglec.a.a + angleb.a.a));//get angle a
 				linea.l.l = sqrt(lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - 2 * lineb.l.l * linec.l.l * cos(anglea.a.a));//get line a
 			}
 			else if (anglec.a.known){//if angle c is known
-				angleb.a.a = asin(lineb.l.l * (sin(anglec.a.a) / linec.l.l));//get angle b
-				anglea.a.a = PI - (anglec.a.a + angleb.a.a);//get angle a
+				angleb.a.a = fabs(asin(lineb.l.l * (sin(anglec.a.a) / linec.l.l)));//get angle b
+				anglea.a.a = fabs(PI - (anglec.a.a + angleb.a.a));//get angle a
 				linea.l.l = sqrt(lineb.l.l * lineb.l.l + linec.l.l * linec.l.l - 2 * lineb.l.l * linec.l.l * cos(anglea.a.a));//get line a
 			}
 		}
 		else if(linea.l.known && linec.l.known){//if line a and c is known
 			if (anglea.a.known){//if angle a is known
-				anglec.a.a = asin(linea.l.l * (sin(anglea.a.a) / linea.l.l));//get angle c
-				angleb.a.a = PI - (anglea.a.a + anglec.a.a);//get angle b
+				anglec.a.a = fabs(asin(linea.l.l * (sin(anglea.a.a) / linea.l.l)));//get angle c
+				angleb.a.a = fabs(PI - (anglea.a.a + anglec.a.a));//get angle b
 				lineb.l.l = sqrt(linea.l.l * linea.l.l + linec.l.l * linec.l.l - 2 * linea.l.l * linec.l.l * cos(angleb.a.a));//get line b
 			}
 			else if (angleb.a.known){//if angle b is known
@@ -1316,8 +1316,8 @@ void Calculate(void){//calculate values in the triangle
 				anglec.a.a = acos((linea.l.l * linea.l.l + lineb.l.l * lineb.l.l - linec.l.l * linec.l.l) / fabs(2 * linea.l.l*lineb.l.l));
 			}
 			else if (anglec.a.known){//if angle c is known
-				anglea.a.a = asin(linea.l.l * (sin(anglec.a.a) / linec.l.l));//get angle a
-				angleb.a.a = PI - (anglea.a.a + anglec.a.a);//get angle b
+				anglea.a.a = fabs(asin(linea.l.l * (sin(anglec.a.a) / linec.l.l)));//get angle a
+				angleb.a.a = fabs(PI - (anglea.a.a + anglec.a.a));//get angle b
 				lineb.l.l = sqrt(linea.l.l * linea.l.l + linec.l.l * linec.l.l - 2 * linea.l.l * linec.l.l * cos(angleb.a.a));//get line b
 			}
 		}
