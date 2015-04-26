@@ -965,7 +965,7 @@ void DrawBase(void){//draw basic stuff
 	rect.w = (int)(ws * maxside);//set width and height
 	rect.h = (int)(hs * 0.25 * maxside);
 	rect.x = 0;//set x and y
-	rect.y = (int)(0.75 * maxside);
+	rect.y = (int)(0.75 * maxside * hs);
 	SDL_RenderFillRect(renderer, &rect);//draw rectangle to mask bottom
 }
 
