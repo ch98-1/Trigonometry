@@ -1214,6 +1214,105 @@ void GetKnown(void){//recalculate known points
 			anglec.a.known = 0;
 		}
 	}
+
+
+	
+	if (anglea.a.known && angleb.a.known){//if angle a and b is known
+		if (anglea.a.a + angleb.a.a > PI){//if 2 angles are too big
+			if (anglea.a.priority == 1){//set 2nd one to unknown
+				anglea.a.known = 0;
+			}
+			if (angleb.a.priority == 1){
+				angleb.a.known = 0;
+			}
+			if (anglec.a.priority == 2){//if 3rd one is a angle
+				if (linea.l.priority == 4){//set 5th one to known
+					linea.l.known = 1;
+				}
+				if (lineb.l.priority == 4){
+					lineb.l.known = 1;
+				}
+				if (linec.l.priority == 4){
+					linec.l.known = 1;
+				}
+			}
+			else{//if not
+				if (linea.l.priority == 3){//set 4th one to known
+					linea.l.known = 1;
+				}
+				if (lineb.l.priority == 3){
+					lineb.l.known = 1;
+				}
+				if (linec.l.priority == 3){
+					linec.l.known = 1;
+				}
+			}
+		}
+	}
+	else if (angleb.a.known && anglec.a.known){//if angle b and c is known
+		if (angleb.a.a + anglec.a.a > PI){//if 2 angles are too big
+			if (angleb.a.priority == 1){
+				angleb.a.known = 0;
+			}
+			if (anglec.a.priority == 1){
+				anglec.a.known = 0;
+			}
+			if (anglea.a.priority == 2){//if 3rd one is a angle
+				if (linea.l.priority == 4){//set 5th one to known
+					linea.l.known = 1;
+				}
+				if (lineb.l.priority == 4){
+					lineb.l.known = 1;
+				}
+				if (linec.l.priority == 4){
+					linec.l.known = 1;
+				}
+			}
+			else{//if not
+				if (linea.l.priority == 3){//set 4th one to known
+					linea.l.known = 1;
+				}
+				if (lineb.l.priority == 3){
+					lineb.l.known = 1;
+				}
+				if (linec.l.priority == 3){
+					linec.l.known = 1;
+				}
+			}
+		}
+	}
+	else if (anglea.a.known && anglec.a.known){//if angle a and c is known
+		if (anglea.a.a + anglec.a.a > PI){//if 2 angles are too big
+			if (anglea.a.priority == 1){//set 2nd one to unknown
+				anglea.a.known = 0;
+			}
+			if (anglec.a.priority == 1){
+				anglec.a.known = 0;
+			}
+			if (angleb.a.priority == 2){//if 3rd one is a angle
+				if (linea.l.priority == 4){//set 5th one to known
+					linea.l.known = 1;
+				}
+				if (lineb.l.priority == 4){
+					lineb.l.known = 1;
+				}
+				if (linec.l.priority == 4){
+					linec.l.known = 1;
+				}
+			}
+			else{//if not
+				if (linea.l.priority == 3){//set 4th one to known
+					linea.l.known = 1;
+				}
+				if (lineb.l.priority == 3){
+					lineb.l.known = 1;
+				}
+				if (linec.l.priority == 3){
+					linec.l.known = 1;
+				}
+			}
+		}
+	}
 	//printf("anglea %d %d, angleb %d %d, anglec %d %d, linea %d %d, lineb %d %d, linec %d %d\n", anglea.a.priority, anglea.a.known, angleb.a.priority, angleb.a.known, anglec.a.priority, anglec.a.known, linea.l.priority, linea.l.known, lineb.l.priority, lineb.l.known, linec.l.priority, linec.l.known);//print out priority and known
 	return;//end of function
 }
